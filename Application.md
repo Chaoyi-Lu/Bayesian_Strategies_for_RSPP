@@ -25,7 +25,7 @@ The parallel computation is implemented for the $N$ auxiliary draws.
 The function `S.G.ABC.MCMC.Strauss.repeat.draws()` implements one round of proposed draw for the SPP in the `repeat` loop of the ABC-MCMC algorithm proposed by [Shirota and Gelfand (2017)](https://doi.org/10.1080/10618600.2017.1299627) and returns the proposed states as well as the indicator of whether the corresponding $\Psi(\hat{\theta}',\hat{a})$ is smaller than the acceptance threshold $\epsilon$.
 The function `S.G.Parallel.ABC.MCMC.Strauss()` apply the implementation of the ABC-MCMC algorithm with the approximate parallel computation discussed in section $4$ of the paper.
 
-We start from the process of generating the artificial data used in the SPP simulation study.
+We start from the process of generating the artificial data used in the SPP simulation study where we set $\beta = 200, \gamma = 0.1$ and $R = 0.05$ on $S = [0,1]\times[0,1]$.
 
 ``` r
 ## Generate from a Strauss point process
@@ -64,4 +64,22 @@ par(xpd=FALSE)
 par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42),mgp=c(3,1,0))
 ```
 
+The ground truth implementation is to apply the exchange algorithm for $1200000$ iterations as follows.
 
+``` r
+# Exchange Ground Truth
+cl <- parallel::makeCluster(detectCores()[1]-1)
+clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel running
+time_start <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T1200000_1 <-
+  SPP_Parallel_Noisy_MH(Y=cbind(SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$x,SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$y),
+                                  beta0=190, gamma0=0.2,eps_beta=65, eps_gamma=0.16, R=SS1_SPP_R_hat, N=1, T=1200000)
+time_end <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T1200000_1_time <- time_end-time_start
+# stopCluster(cl)
+# Time difference of 2.459206 hours # This is the implementation time we show on the paper
+```
+
+Here we provide a reference of the time taken by the implementation.
+The function above returns a list of $\beta$ chain and a list of $\gamma$ chain as well as the corresponding acceptance rate of the algorithm.
+The outputs are stored in `SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T1200000_1`.
