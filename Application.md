@@ -108,10 +108,109 @@ sd(SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T1200000_1$gamma[200001:1200001])
 ```
 
 Note here that the first element of the chain is the initial state $\theta^{(0)}$ and thus we need to drop the first $200001$ iterations in order for the $200000$ burn-in.
-Similar implementations and corresponding summarizing processes are applied for the exchange and noisy M-H algorithms with $120000$ iterations.
+Similar implementations are applied for the exchange and noisy M-H algorithms with $120000$ iterations.
 The noisy M-H algorithms are implemented from $n=2$ to $n=9$ where the $n=1$ case is equivalent to the exchange algorithm.
 
+``` r
+# # Exchange == Noisy M-H N1 0.12 million iterations
+# cl <- parallel::makeCluster(detectCores()[1]-1)
+# clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel running
+time_start <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T120000_1 <-
+  SPP_Parallel_Noisy_MH(Y=cbind(SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$x,SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$y),
+                                  beta0=190, gamma0=0.2,eps_beta=65, eps_gamma=0.16, R=SS1_SPP_R_hat, N=1, T=120000)
+time_end <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T120000_1_time <- time_end-time_start
+# stopCluster(cl)
+# # Time difference of 16.09556 mins
 
+# # Noisy Exchange N2
+# cl <- parallel::makeCluster(detectCores()[1]-1)
+# clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel running
+time_start <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N2_T120000_1 <-
+  SPP_Parallel_Noisy_MH(Y=cbind(SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$x,SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$y),
+                                  beta0=190, gamma0=0.2,eps_beta=65, eps_gamma=0.16, R=SS1_SPP_R_hat, N=2, T=120000)
+time_end <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N2_T120000_1_time <- time_end-time_start
+# stopCluster(cl)
+# # Time difference of 20.47789 mins
+
+# # Noisy Exchange N3
+# cl <- parallel::makeCluster(detectCores()[1]-1)
+# clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel running
+time_start <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N3_T120000_1 <-
+  SPP_Parallel_Noisy_MH(Y=cbind(SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$x,SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$y),
+                                  beta0=190, gamma0=0.2,eps_beta=65, eps_gamma=0.16, R=SS1_SPP_R_hat, N=3, T=120000)
+time_end <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N3_T120000_1_time <- time_end-time_start
+# stopCluster(cl)
+# # Time difference of 26.43284 mins
+
+# # Noisy Exchange N4
+# cl <- parallel::makeCluster(detectCores()[1]-1)
+# clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel running
+time_start <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N4_T120000_1 <-
+  SPP_Parallel_Noisy_MH(Y=cbind(SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$x,SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$y),
+                                  beta0=190, gamma0=0.2,eps_beta=65, eps_gamma=0.16, R=SS1_SPP_R_hat, N=4, T=120000)
+time_end <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N4_T120000_1_time <- time_end-time_start
+# stopCluster(cl)
+# # Time difference of 29.71931 mins
+
+# # Noisy Exchange N5
+# cl <- parallel::makeCluster(detectCores()[1]-1)
+# clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel running
+time_start <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N5_T120000_1 <-
+  SPP_Parallel_Noisy_MH(Y=cbind(SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$x,SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$y),
+                                  beta0=190, gamma0=0.2,eps_beta=65, eps_gamma=0.16, R=SS1_SPP_R_hat, N=5, T=120000)
+time_end <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N5_T120000_1_time <- time_end-time_start
+# stopCluster(cl)
+# # Time difference of 33.15239 mins
+
+# # Noisy Exchange N6
+# cl <- parallel::makeCluster(detectCores()[1]-1)
+# clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel running
+time_start <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N6_T120000_1 <-
+  SPP_Parallel_Noisy_MH(Y=cbind(SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$x,SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$y),
+                                  beta0=190, gamma0=0.2,eps_beta=65, eps_gamma=0.16, R=SS1_SPP_R_hat, N=6, T=120000)
+time_end <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N6_T120000_1_time <- time_end-time_start
+# stopCluster(cl)
+# # Time difference of 35.10859 mins
+
+# # Noisy Exchange N7
+# cl <- parallel::makeCluster(detectCores()[1]-1)
+# clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel running
+time_start <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N7_T120000_1 <-
+  SPP_Parallel_Noisy_MH(Y=cbind(SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$x,SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$y),
+                                  beta0=190, gamma0=0.2,eps_beta=65, eps_gamma=0.16, R=SS1_SPP_R_hat, N=7, T=120000)
+time_end <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N7_T120000_1_time <- time_end-time_start
+# stopCluster(cl)
+# # Time difference of 41.63192 mins
+
+# # Noisy Exchange N8
+# cl <- parallel::makeCluster(detectCores()[1]-1)
+# clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel running
+time_start <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N8_T120000_1 <-
+  SPP_Parallel_Noisy_MH(Y=cbind(SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$x,SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$y),
+                                  beta0=190, gamma0=0.2,eps_beta=65, eps_gamma=0.16, R=SS1_SPP_R_hat, N=8, T=120000)
+time_end <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N8_T120000_1_time <- time_end-time_start
+stopCluster(cl)
+# Time difference of 58.90153 mins
+```
+
+The corresponding reference implementation time is also provided above for each case.
+The summarizing processes are similar to the ground truth case shown above and we propose not to put them here in order not to make this file become too lengthy.
 
 
 
