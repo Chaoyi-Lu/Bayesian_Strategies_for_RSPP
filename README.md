@@ -1,1 +1,1 @@
-# Bayesian_Strategies_for_RSPP
+# Bayesian Strategies for Repulsive Spatial Point Processes
