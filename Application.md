@@ -82,4 +82,29 @@ SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T1200000_1_time <- time_end-time_start
 
 Here we provide a reference of the time taken by the implementation.
 The function above returns a list of $\beta$ chain and a list of $\gamma$ chain as well as the corresponding acceptance rate of the algorithm.
-The outputs are stored in `SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T1200000_1`.
+The outputs are stored in `SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T1200000_1` and thus we can apply the summary statistics on those outputs shown below.
+
+``` r
+# # Example summary statistics
+# Acceptance rate
+SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T1200000_1$AcceptanceRate
+# Posterior trace plot
+plot(SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T1200000_1$beta, type = "l")
+plot(SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T1200000_1$gamma, type = "l")
+# Posterior density plot
+plot(density(SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T1200000_1$beta[200001:1200001]))
+plot(density(SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T1200000_1$gamma[200001:1200001]))
+# ESS/s
+ESS(SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T1200000_1$beta[200001:1200001])/(SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T1200000_1_time[[1]]*3600)
+ESS(SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T1200000_1$gamma[200001:1200001])/(SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T1200000_1_time[[1]]*3600)
+# Average ESS/s
+(ESS(SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T1200000_1$beta[200001:1200001])+ESS(SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T1200000_1$gamma[200001:1200001]))/(2*SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T1200000_1_time[[1]]*3600)
+# Posterior mean
+mean(SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T1200000_1$beta[200001:1200001])
+mean(SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T1200000_1$gamma[200001:1200001])
+# Posterior standard deviation
+sd(SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T1200000_1$beta[200001:1200001])
+sd(SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T1200000_1$gamma[200001:1200001])
+```
+
+Note here that the first element of the chain is the initial state $\theta^{(0)}$ and thus we need to drop the first $200001$ iterations in order for the $200000$ burn-in. 
