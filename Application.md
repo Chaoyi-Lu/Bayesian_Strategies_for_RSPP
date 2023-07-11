@@ -9,7 +9,7 @@ rm(list=ls())
 source("Algorithm_Functions_for_RSPP.R")
 library(spatstat) # For point processes simulations and related application
 library(doParallel) # For parallel computation
-library(LaplacesDemon) # For logdet() function
+library(LaplacesDemon) # For ESS() and logdet() function
 ```
 
 The explanations of each function and almost each line of the code in [`Algorithm_Functions_for_RSPP.R`] are provided in the corresponding comments in the file.
@@ -107,4 +107,12 @@ sd(SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T1200000_1$beta[200001:1200001])
 sd(SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T1200000_1$gamma[200001:1200001])
 ```
 
-Note here that the first element of the chain is the initial state $\theta^{(0)}$ and thus we need to drop the first $200001$ iterations in order for the $200000$ burn-in. 
+Note here that the first element of the chain is the initial state $\theta^{(0)}$ and thus we need to drop the first $200001$ iterations in order for the $200000$ burn-in.
+Similar implementations and corresponding summarizing processes are applied for the exchange and noisy M-H algorithms with $120000$ iterations.
+The noisy M-H algorithms are implemented from $n=2$ to $n=9$ where the $n=1$ case is equivalent to the exchange algorithm.
+
+
+
+
+
+
