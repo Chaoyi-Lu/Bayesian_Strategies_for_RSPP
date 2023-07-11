@@ -2,12 +2,14 @@
 This file illustrates the code and the corresponding applications associated to the outputs shown in the *Bayesian Strategies for Repulsive Spatial Point Processes* paper.
 The code of both two simulation studies and the real data application is provided.
 
-The source code is included in the [`Algorithm_Functions_for_RSPP.R`] and can be loaded by the following code.
+The source code is included in the [`Algorithm_Functions_for_RSPP.R`] and can be loaded together with some required `R` packages by the following code.
 
 ``` r
 rm(list=ls())
-
 source("Algorithm_Functions_for_RSPP.R")
+library(spatstat) # For point processes simulations and related application
+library(doParallel) # For parallel computation
+library(LaplacesDemon) # For logdet() function
 ```
 
 The explanations of each function and almost each line of the code in [`Algorithm_Functions_for_RSPP.R`] are provided in the corresponding comments in the file.
