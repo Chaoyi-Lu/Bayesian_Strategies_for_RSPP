@@ -10,6 +10,8 @@ rm(list=ls())
 source("Algorithm_Functions_for_RSPP.R")
 ```
 
+## Strauss Point Process Simulation Study
+
 The explanations of each function and almost each line of the code in [`Algorithm_Functions_for_RSPP.R`] are provided in the corresponding comments in the file.
 Note that the function `Noisy_E_nth_Ratio()` corresponds to the $n$' th auxiliary draw of the noisy Metropolis-Hastings (noisy M-H) algorithm as well as the corresponding evaluation of the unnormalised likelihood ratio $\frac{q(x_n'|\theta^{(t-1)})}{q(x_n'|\theta')}$ where we use notation $N$ instead of $K$ to denote the number of auxiliary draws for the noisy M-H algorithm in the code.
 
@@ -17,5 +19,6 @@ The function `SPP_Parallel_Noisy_MH()` is the noisy M-H algorithm implemented fo
 Note further that, by setting $N=1$, the algorithm becomes the exchange algorithm.
 The parallel computation is implemented for the $N$ auxiliary draws.
 
-The function `S.G.ABC.MCMC.Strauss.repeat.draws()` implements one round of draw in the `repeat` loop of the ABC-MCMC algorithm proposed by [Shirota and Gelfand (2017)](https://doi.org/10.1080/10618600.2017.1299627) and returns the corresponding indicator of whether the $\Psi(\hat{\theta}',\hat{a})$ is smaller than the acceptance threshold $\epsilon$ as well as the corresponding proposed states.
+The function `S.G.ABC.MCMC.Strauss.repeat.draws()` implements one round of proposed draw for the Strauss point process in the `repeat` loop of the ABC-MCMC algorithm proposed by [Shirota and Gelfand (2017)](https://doi.org/10.1080/10618600.2017.1299627) and returns the proposed states as well as the indicator of whether the corresponding $\Psi(\hat{\theta}',\hat{a})$ is smaller than the acceptance threshold $\epsilon$.
+The function `S.G.Parallel.ABC.MCMC.Strauss()` apply the implementation of the ABC-MCMC algorithm with the approximate parallel computation discussed in section $4$ of the paper.
 
