@@ -108,6 +108,9 @@ sd(SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T1200000_1$gamma[200001:1200001])
 ```
 
 Note here that the first element of the chain is the initial state $\theta^{(0)}$ and thus we need to drop the first $200001$ iterations in order for the $200000$ burn-in.
+
+### The Implementation of the Exchange and Noisy M-H Algorithms
+
 Similar implementations are applied for the exchange and noisy M-H algorithms with $120000$ iterations.
 The noisy M-H algorithms are implemented from $n=2$ to $n=9$ where the $n=1$ case is equivalent to the exchange algorithm.
 
@@ -212,6 +215,7 @@ stopCluster(cl)
 The corresponding reference implementation time is also provided above for each case.
 The summarizing processes are similar to the ground truth case shown above and we propose not to put them here in order not to make this file become too lengthy.
 
+### The Implementation of the ABC-MCMC algorithm
 
 
 
