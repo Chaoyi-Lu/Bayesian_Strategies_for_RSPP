@@ -17,5 +17,5 @@ The function `SPP_Parallel_Noisy_MH()` is the noisy M-H algorithm implemented fo
 Note further that, by setting $N=1$, the algorithm becomes the exchange algorithm.
 The parallel computation is implemented for the $N$ auxiliary draws.
 
-The function `S.G.ABC.MCMC.Strauss.repeat.draws()` implements one round of draw in the `repeat` loop and returns the corresponding indicator of whether the $\Psi(\hat{\theta}',\hat{a})$ is smaller than the acceptance threshold $\epsilon$ as well as the corresponding proposed states.
+The function `S.G.ABC.MCMC.Strauss.repeat.draws()` implements one round of draw in the `repeat` loop of the ABC-MCMC algorithm proposed by `Shirota and Gelfand (2017)` and returns the corresponding indicator of whether the $\Psi(\hat{\theta}',\hat{a})$ is smaller than the acceptance threshold $\epsilon$ as well as the corresponding proposed states.
 
