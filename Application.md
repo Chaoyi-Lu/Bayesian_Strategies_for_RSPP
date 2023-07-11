@@ -17,3 +17,5 @@ The function `SPP_Parallel_Noisy_MH()` is the noisy M-H algorithm implemented fo
 Note further that, by setting $N=1$, the algorithm becomes the exchange algorithm.
 The parallel computation is implemented for the $N$ auxiliary draws.
 
+The function `S.G.ABC.MCMC.Strauss.repeat.draws()` implement each round of draws in the 
+
