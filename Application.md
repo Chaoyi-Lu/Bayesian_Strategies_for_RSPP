@@ -50,11 +50,18 @@ SS1_SPP_pplmStrauss$fit
 SS1_SPP_R_hat <- SS1_SPP_pplmStrauss$fit$interaction$par$r # Store the estimated R
 ```
 
-And the code below provides the profile pseudo-likelihood plot in SPP simulation study of the paper.
+And the code below provides the plot of the point pocations and the profile pseudo-likelihood plot shown in SPP simulation study of the paper.
 
 ``` r
-plot(SS1_SPP_pplmStrauss$param[,1],SS1_SPP_pplmStrauss$prof,type = "l",xlab = "R",ylab = "log PL") # profile pseudo-likelihood plot in simulation study 1
+par(mfrow=c(1,2),mai = c(0.55, 0.5, 0.25, 0.05),mgp=c(1.25,0.45,0))
+plot(SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$x,SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$y,xlab = "",ylab = "",main="",cex.lab = 0.8)
+
+plot(SS1_SPP_pplmStrauss$param[,1],SS1_SPP_pplmStrauss$prof,type = "l",xlab = "R",ylab = "log PL",cex.main=1,cex.lab = 1)
 abline(v=SS1_SPP_pplmStrauss$fit$interaction$par$r,col = 2,lty = 2)
+par(xpd=TRUE)
+text(0.0508,210, TeX(r'($\hat{R}=0.508$)'), pos = 4,col=2)
+par(xpd=FALSE)
+par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42),mgp=c(3,1,0))
 ```
 
 
