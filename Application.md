@@ -33,11 +33,28 @@ Z_observation <- rStrauss(beta = 200, gamma = 0.1, R = 0.05, W = square(1))
 # utils::write.table(x=cbind(Z_observation$x,Z_observation$y),file="SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY.csv", sep="," , row.names = FALSE, col.names=FALSE)
 ```
 
-All the point locations are stored in the file [`SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY.csv`] and can be called directly.
+All the point locations are stored in the file [`SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY.csv`] and can be called directly as follows.
 
 ``` r
 ## Simulation study 1 observation
 SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY <- as.matrix(read.csv("SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY.csv",header=FALSE))
 SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY  <- ppp(SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY[,1],SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY[,2]) # transform to point pattern class
 ```
+
+Then we can obtain the estimated interaction radius $R$ by the profile pseudo-likelihood method
+
+``` r
+## profile pseudo-likelihood method, i.e. maximum pseudo-likelihood calculated at r
+SS1_SPP_pplmStrauss <- profilepl(data.frame(r=seq(0.01,0.1, by=0.0001)), Strauss, SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY)
+SS1_SPP_pplmStrauss$fit
+SS1_SPP_R_hat <- SS1_SPP_pplmStrauss$fit$interaction$par$r # Store the estimated R
+```
+
+And the code below provides the profile pseudo-likelihood plot in SPP simulation study of the paper.
+
+``` r
+plot(SS1_SPP_pplmStrauss$param[,1],SS1_SPP_pplmStrauss$prof,type = "l",xlab = "R",ylab = "log PL") # profile pseudo-likelihood plot in simulation study 1
+abline(v=SS1_SPP_pplmStrauss$fit$interaction$par$r,col = 2,lty = 2)
+```
+
 
