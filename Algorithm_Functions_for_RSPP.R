@@ -9,7 +9,7 @@
 #--------------------------------------------------------------------------------------------------------------------------------------------
 
 # Noisy M-H algorithm for the Strauss point process with parallel computation
-Noisy_E_Nth_Ratio <- function(x, beta_p, gamma_p, R, beta_c, gamma_c){ 
+Noisy_E_nth_Ratio <- function(x, beta_p, gamma_p, R, beta_c, gamma_c){ 
   # beta_c, gamma_c: Current beta and gamma state
   # beta_p, gamma_p: Proposed beta and gamma state
   Z_p <- rStrauss(beta = beta_p, gamma = gamma_p, R = R, W = square(1))
@@ -50,7 +50,7 @@ SPP_Parallel_Noisy_MH <- function(Y, beta0, gamma0, eps_beta, eps_gamma, R, N, T
     gamma_p <- runif(1, gamma_p_lb, gamma_p_ub)
     
     # Calculate the unbiased importance sampling estimator of the normalizing constant ratio
-    noisy_E <- mean(parSapply(cl, 1:N, Noisy_E_Nth_Ratio, beta_p = beta_p, gamma_p = gamma_p, R = R, beta_c = beta_list[t], gamma_c = gamma_list[t]))
+    noisy_E <- mean(parSapply(cl, 1:N, Noisy_E_nth_Ratio, beta_p = beta_p, gamma_p = gamma_p, R = R, beta_c = beta_list[t], gamma_c = gamma_list[t]))
     # Calculate the log acceptance ratio alpha_NMH
     log_alpha_right <-  N_Y*(log(beta_p)-log(beta_list[t])) + s_R_Y*(log(gamma_p)-log(gamma_list[t])) + log(noisy_E) + 
       log(beta_p_ub-beta_p_lb) + log(gamma_p_ub-gamma_p_lb) - 
@@ -234,7 +234,7 @@ dppG_MH <- function(Y, tau0, sigma0, eps_tau, eps_sigma, T){ # tau0: initial tau
 #--------------------------------------------------------------------------------------------------------------------------------------------
 
 # Noisy MH algorithm for determinantal point process Gaussian model with parallel computation
-dppG_Noisy_E_Nth_Ratio <- function(x, tau_p, sigma_p,dppGauss.eigen_p,dppGauss.eigen_c){ # Current state tau and sigma
+dppG_Noisy_E_nth_Ratio <- function(x, tau_p, sigma_p,dppGauss.eigen_p,dppGauss.eigen_c){ # Current state tau and sigma
   Z_p <- simulate(dppGauss(lambda=tau_p, alpha=sigma_p, d=2))
   X_p <- cbind(Z_p$x, Z_p$y) # Generate X' from likelihood( |(tau',sigma'))
   return(exp(dppG_logDensity(X_p,dppGauss.eigen_c)-dppG_logDensity(X_p,dppGauss.eigen_p)))
@@ -274,7 +274,7 @@ dppG_Parallel_Noisy_MH <- function(Y, tau0, sigma0, eps_tau, eps_sigma, N, T){ #
     dppGauss.eigen_c <- dppeigen(dppGauss(lambda=tau_list[t], alpha=sigma_list[t], d=2),trunc=0.99, Wscale = c(1,1))
     
     # Calculate the unbiased importance sampling estimator of the normalizing constant ratio
-    noisy_E <- mean(parSapply(cl, 1:N, dppG_Noisy_E_Nth_Ratio, tau_p=tau_p, sigma_p=sigma_p,
+    noisy_E <- mean(parSapply(cl, 1:N, dppG_Noisy_E_nth_Ratio, tau_p=tau_p, sigma_p=sigma_p,
                               dppGauss.eigen_p=dppGauss.eigen_p,dppGauss.eigen_c=dppGauss.eigen_c))
     # Calculate the log acceptance ratio alpha_DPPG
     log_alpha_right <-  log(noisy_E)+dppG_logDensity(Y,dppGauss.eigen_p)-dppG_logDensity(Y,dppGauss.eigen_c) + 
@@ -298,7 +298,7 @@ dppG_Parallel_Noisy_MH <- function(Y, tau0, sigma0, eps_tau, eps_sigma, N, T){ #
 #--------------------------------------------------------------------------------------------------------------------------------------------
 
 # Approximate Noisy M-H algorithm for determinantal point process Gaussian model with parallel computation
-Approx_dppG_Noisy_E_Nth_Ratio <- function(x, tau_p, sigma_p,tau_c, sigma_c){ # Current state tau and sigma
+Approx_dppG_Noisy_E_nth_Ratio <- function(x, tau_p, sigma_p,tau_c, sigma_c){ # Current state tau and sigma
   Z_p <- simulate(dppGauss(lambda=tau_p, alpha=sigma_p, d=2))
   X_p <- cbind(Z_p$x, Z_p$y) # Generate X' from likelihood( |(tau',sigma'))
   X_p.dist <- as.matrix(dist(X_p,diag=TRUE,upper=TRUE))
@@ -337,7 +337,7 @@ Approx_dppG_Parallel_Noisy_MH <- function(Y, tau0, sigma0, eps_tau, eps_sigma, N
     sigma_p <- runif(1, sigma_p_lb, sigma_p_ub)
     
     # Apply the approximate normalized likelihood to calculate the unbiased importance sampling estimator of the normalizing constant ratio
-    noisy_E <- mean(parSapply(cl, 1:N, Approx_dppG_Noisy_E_Nth_Ratio, tau_p=tau_p, sigma_p=sigma_p,tau_c=tau_list[t],sigma_c=sigma_list[t]))
+    noisy_E <- mean(parSapply(cl, 1:N, Approx_dppG_Noisy_E_nth_Ratio, tau_p=tau_p, sigma_p=sigma_p,tau_c=tau_list[t],sigma_c=sigma_list[t]))
     # Calculate the log approximate acceptance ratio \tilde{alpha}_DPPG
     log_alpha_right <-  log(noisy_E) + logdet(tau_p*exp(-(dist.Y/sigma_p)^2)) - logdet(tau_list[t]*exp(-(dist.Y/sigma_list[t])^2))
     log(tau_p_ub-tau_p_lb) + log(sigma_p_ub-sigma_p_lb) - 
@@ -457,7 +457,7 @@ S.G.Parallel.ABC.MCMC.dppG <- function(Y, tau0, sigma0, eps_tau, eps_sigma, lmCo
 # The functions below are designed for real duke forest data application
 # The only difference compared to simulation study 1 functions is the prior settings
 
-Noisy_E_Nth_Ratio <- function(x, beta_p, gamma_p, R, beta_c, gamma_c){ # Current state beta and gamma
+Noisy_E_nth_Ratio <- function(x, beta_p, gamma_p, R, beta_c, gamma_c){ # Current state beta and gamma
   Z_p <- rStrauss(beta = beta_p, gamma = gamma_p, R = R, W = square(1))
   X_p <- cbind(Z_p$x, Z_p$y) # Generate X' from likelihood( |(beta',gamma'))
   return(((beta_c/beta_p)^(Z_p$n))*((gamma_c/gamma_p)^(sum(dist(X_p)<=R))))
@@ -496,7 +496,7 @@ df_SPP_Parallel_Noisy_MH <- function(Y, beta0, gamma0, eps_beta, eps_gamma, R, N
     gamma_p <- runif(1, gamma_p_lb, gamma_p_ub)
     
     # Find the noisy exchange sum for N
-    noisy_E <- mean(parSapply(cl, 1:N, Noisy_E_Nth_Ratio, beta_p = beta_p, gamma_p = gamma_p, R = R, beta_c = beta_list[t], gamma_c = gamma_list[t]))
+    noisy_E <- mean(parSapply(cl, 1:N, Noisy_E_nth_Ratio, beta_p = beta_p, gamma_p = gamma_p, R = R, beta_c = beta_list[t], gamma_c = gamma_list[t]))
     log_alpha_right <-  N_Y*(log(beta_p)-log(beta_list[t])) + s_R_Y*(log(gamma_p)-log(gamma_list[t])) + log(noisy_E) + 
       log(beta_p_ub-beta_p_lb) + log(gamma_p_ub-gamma_p_lb) - 
       log(min(350,beta_p+eps_beta)-max(50,beta_p-eps_beta)) - log(min(1,gamma_p+eps_gamma)-max(0,gamma_p-eps_gamma))
