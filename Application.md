@@ -253,5 +253,33 @@ SS1_SPP_Pilot.time <- time_end-time_start
 stopCluster(cl)
 ```
 
+The corresponding reference implementation time of the pilot run is also provided.
+However, it can be neglected if we compare to the time taken by the main algorithm of the ABC-MCMC algorithm and thus it was not counted in the comparisons.
+Due to the fact that the parallel computation code returns a list each element of which further contains a list of outputs from each iteration of the pilot run.
+We need to extract each single chain of parameter by the following code.
 
+``` r
+# Transform pilot draws to single chains of parameters
+SS1_SPP_Pilot.beta <- c()
+SS1_SPP_Pilot.gamma <- c()
+SS1_SPP_Pilot.X <- list()
+SS1_SPP_Pilot.eta <- matrix(0,SS1_SPP_Pilot.L,2)
+for(l in 1:SS1_SPP_Pilot.L){
+  SS1_SPP_Pilot.beta[l]=SS1_SPP_Pilot[[l]]$beta
+  SS1_SPP_Pilot.gamma[l]=SS1_SPP_Pilot[[l]]$gamma
+  SS1_SPP_Pilot.X[[l]]=SS1_SPP_Pilot[[l]]$X
+  SS1_SPP_Pilot.eta[l,] <- SS1_SPP_Pilot[[l]]$eta
+}
+```
+
+Recall from the paper that the generalised linear regression under a multi-response Gaussian family is fit with lasso regression, and cross-validation is applied to determine the penalty parameter for the lasso.
+This can be accomplished by the `cv.glmnet()` function in the `glmnet` package where `family="mgaussian"` corresponds to the multi-response Gaussian family, `alpha=1` corresponds to the lasso regression.
+
+``` r
+# apply glmnet for regression, i.e. glm with lasso and determine the penalty parameter for the lasso by cross-validation (cv)
+library(glmnet)
+SS1_SPP_Pilot.lmCoef <- coef(cv.glmnet(x=SS1_SPP_Pilot.eta,y=log(cbind(SS1_SPP_Pilot.beta,SS1_SPP_Pilot.gamma)),family="mgaussian",alpha=1),s="lambda.min")
+```
+
+Then we can extract the linear coefficients and calculate the sample variance of each estimated model parameter as well as the distance measures $\{ \Psi(\boldsymbol{\hat{\theta}}_l, \boldsymbol{\hat{a}}) \}^{L}_{l = 1}$ for each iteration of the pilot run.
 
