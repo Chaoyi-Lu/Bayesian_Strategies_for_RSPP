@@ -218,13 +218,13 @@ The summarizing processes are similar to the ground truth case shown above and w
 ### The Implementation of the ABC-MCMC algorithm
 
 As discussed in section $4$ of the paper, the ABC-MCMC algorithm we make the comparisons with requires a pilot run to approximate the linear coefficients of the linear regression and to decide the acceptance thresholds.
-We start from setting the $K-$ function at the observation $\boldsymbol{y}$ and setting the number of iterations in the pilot run.
+We start from setting the $K$-function for the observation $\boldsymbol{y}$ with respect to $\hat{R}$, and setting the number of iterations in the pilot run.
 
 ``` r
 # obtain Kfunc for Y
 SS1_SPP_Kfunc_Obs=as.function(Kest(SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY, correction="isotropic"))
-# SS1_SPP_R_hat <- SS1_SPP_pplmStrauss$fit$interaction$par$r
 SS1_SPP_Kfunc_Obs_R_hat <- SS1_SPP_Kfunc_Obs(SS1_SPP_R_hat)
+# Set L for the pilot run
 SS1_SPP_Pilot.L <- 10000
 ```
 
