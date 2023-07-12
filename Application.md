@@ -228,6 +228,30 @@ SS1_SPP_Kfunc_Obs_R_hat <- SS1_SPP_Kfunc_Obs(SS1_SPP_R_hat)
 SS1_SPP_Pilot.L <- 10000
 ```
 
+Then we define a function to apply the pilot run and implement the parallel computation for it.
+Here the settings follow what we introduced in the simulation study section $6.1$ of the paper.
+
+``` r
+# ABC-MCMC Pilot Draws Function
+ABCMCMC_Pilot_lth_Draw_SPP <- function(x, N_Y, R, Kfunc_Obs_R_hat){ # Current state beta and gamma
+  beta=runif(1,50,400)
+  gamma=runif(1,0,1)
+  X=rStrauss(beta,gamma,R,square(1))
+  Kfunc_X=as.function(Kest(X, correction="isotropic"))
+  eta <- c(log(X$n)-log(N_Y),(sqrt(Kfunc_X(R))-sqrt(Kfunc_Obs_R_hat))^2)
+  return(list(beta=beta,gamma=gamma,X=X,eta=eta))
+}
+# Implement pilot run in parallel
+cl <- parallel::makeCluster(detectCores()[1]-1)
+clusterExport(cl=cl, list("rStrauss", "square","Kest")) # In order to use this function for parallel running
+time_start <- Sys.time()
+SS1_SPP_Pilot <- parLapply(cl, 1:SS1_SPP_Pilot.L, ABCMCMC_Pilot_lth_Draw_SPP, N_Y=SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$n, R=SS1_SPP_R_hat,
+                           Kfunc_Obs_R_hat = SS1_SPP_Kfunc_Obs_R_hat)
+time_end <- Sys.time()
+SS1_SPP_Pilot.time <- time_end-time_start
+# Time difference of 1.518383 mins
+stopCluster(cl)
+```
 
 
 
