@@ -69,7 +69,7 @@ The ground truth implementation is to apply the exchange algorithm for $1200000$
 ``` r
 # Exchange Ground Truth
 cl <- parallel::makeCluster(detectCores()[1]-1)
-clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel running
+clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel computation
 time_start <- Sys.time()
 SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K1_T1200000_1 <-
   SPP_Parallel_Noisy_MH(Y=cbind(SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$x,SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$y),
@@ -117,7 +117,7 @@ The noisy M-H algorithms are implemented from $k=2$ to $k=8$ where the $k=1$ cas
 ``` r
 # # Exchange == Noisy M-H K1 0.12 million iterations
 # cl <- parallel::makeCluster(detectCores()[1]-1)
-# clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel running
+# clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel computation
 time_start <- Sys.time()
 SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K1_T120000_1 <-
   SPP_Parallel_Noisy_MH(Y=cbind(SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$x,SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$y),
@@ -129,7 +129,7 @@ SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K1_T120000_1_time <- time_end-time_start
 
 # # Noisy Exchange K2
 # cl <- parallel::makeCluster(detectCores()[1]-1)
-# clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel running
+# clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel computation
 time_start <- Sys.time()
 SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K2_T120000_1 <-
   SPP_Parallel_Noisy_MH(Y=cbind(SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$x,SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$y),
@@ -141,7 +141,7 @@ SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K2_T120000_1_time <- time_end-time_start
 
 # # Noisy Exchange K3
 # cl <- parallel::makeCluster(detectCores()[1]-1)
-# clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel running
+# clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel computation
 time_start <- Sys.time()
 SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K3_T120000_1 <-
   SPP_Parallel_Noisy_MH(Y=cbind(SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$x,SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$y),
@@ -153,7 +153,7 @@ SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K3_T120000_1_time <- time_end-time_start
 
 # # Noisy Exchange K4
 # cl <- parallel::makeCluster(detectCores()[1]-1)
-# clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel running
+# clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel computation
 time_start <- Sys.time()
 SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K4_T120000_1 <-
   SPP_Parallel_Noisy_MH(Y=cbind(SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$x,SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$y),
@@ -165,7 +165,7 @@ SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K4_T120000_1_time <- time_end-time_start
 
 # # Noisy Exchange K5
 # cl <- parallel::makeCluster(detectCores()[1]-1)
-# clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel running
+# clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel computation
 time_start <- Sys.time()
 SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K5_T120000_1 <-
   SPP_Parallel_Noisy_MH(Y=cbind(SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$x,SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$y),
@@ -177,7 +177,7 @@ SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K5_T120000_1_time <- time_end-time_start
 
 # # Noisy Exchange K6
 # cl <- parallel::makeCluster(detectCores()[1]-1)
-# clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel running
+# clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel computation
 time_start <- Sys.time()
 SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K6_T120000_1 <-
   SPP_Parallel_Noisy_MH(Y=cbind(SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$x,SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$y),
@@ -189,7 +189,7 @@ SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K6_T120000_1_time <- time_end-time_start
 
 # # Noisy Exchange K7
 # cl <- parallel::makeCluster(detectCores()[1]-1)
-# clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel running
+# clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel computation
 time_start <- Sys.time()
 SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K7_T120000_1 <-
   SPP_Parallel_Noisy_MH(Y=cbind(SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$x,SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$y),
@@ -201,7 +201,7 @@ SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K7_T120000_1_time <- time_end-time_start
 
 # # Noisy Exchange K8
 # cl <- parallel::makeCluster(detectCores()[1]-1)
-# clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel running
+# clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel computation
 time_start <- Sys.time()
 SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K8_T120000_1 <-
   SPP_Parallel_Noisy_MH(Y=cbind(SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$x,SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$y),
@@ -243,7 +243,7 @@ ABCMCMC_Pilot_lth_Draw_SPP <- function(x, N_Y, R, Kfunc_Obs_R_hat){ # Current st
 }
 # Implement pilot run in parallel
 cl <- parallel::makeCluster(detectCores()[1]-1)
-clusterExport(cl=cl, list("rStrauss", "square","Kest")) # In order to use this function for parallel running
+clusterExport(cl=cl, list("rStrauss", "square","Kest")) # In order to use this function for parallel computation
 time_start <- Sys.time()
 SS1_SPP_Pilot <- parLapply(cl, 1:SS1_SPP_Pilot.L, ABCMCMC_Pilot_lth_Draw_SPP, N_Y=SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$n, R=SS1_SPP_R_hat,
                            Kfunc_Obs_R_hat = SS1_SPP_Kfunc_Obs_R_hat)
@@ -298,9 +298,103 @@ SS1_SPP_Pilot.psi <- ((SS1_SPP_Pilot.eta%*%SS1_SPP_Pilot.lmCoefBeta[2:3])^2)/SS1
 We specify three different percentiles for the acceptance thresholds $\epsilon$.
 
 ``` r
-# Take p* percentile
+# Take p percentile
 SS1_SPP_Pilot.0.005eps <- quantile(SS1_SPP_Pilot.psi,probs=0.005)[[1]]
 SS1_SPP_Pilot.0.01eps <- quantile(SS1_SPP_Pilot.psi,probs=0.01)[[1]]
 SS1_SPP_Pilot.0.025eps <- quantile(SS1_SPP_Pilot.psi,probs=0.025)[[1]]
 ```
+
+The main ABC-MCMC algorithm is implemented as following.
+We start from the case where the $\epsilon$ is set as $2.5$ percent estimated percentile.
+Recall here that the approximate parallel computation as we discussed in the section $4$ of the paper is implemented.
+
+``` r
+## ABC-MCMC algorithm with approximate parallel computation p0.025
+NumCores <- detectCores()[1]-1
+cl <- parallel::makeCluster(NumCores)
+clusterExport(cl=cl, list("rStrauss", "square", "Kest")) # In order to use this function for parallel computation
+time_start <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.025_T120000_1 <-
+  S.G.Parallel.ABC.MCMC.Strauss(Y = SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY, beta0=190, gamma0=0.2,eps_beta=65, eps_gamma=0.16,
+                                lmCoefBeta = SS1_SPP_Pilot.lmCoefBeta, lmCoefGamma = SS1_SPP_Pilot.lmCoefGamma,
+                                Pilot.VarBeta = SS1_SPP_Pilot.VarBeta, Pilot.VarGamma = SS1_SPP_Pilot.VarGamma,
+                                eps = SS1_SPP_Pilot.0.025eps, R=SS1_SPP_R_hat, T=120000)
+time_end <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.025_T120000_1_time <- time_end-time_start
+stopCluster(cl)
+# Time difference of 2.401528 hours
+```
+
+Similar as what we do for the exchange and noisy M-H algorithms, we can obtain the summarized statistics of the outputs as following.
+Note here that we further monitor the number of draws in `repeat` loop until the acceptance condition is satisfied.
+And we also monitor whether there are more than one draws which satisfy the the acceptance condition within one round of $J$ parallel draws.
+
+``` r
+# # Example summary statistics
+# Acceptance rate
+SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.025_T120000_1$AcceptanceRate
+# Posterior trace plot
+plot(SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.025_T120000_1$beta[20001:120001], type = "l")
+plot(SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.025_T120000_1$gamma[20001:120001], type = "l")
+# Posterior density plot
+plot(density(SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.025_T120000_1$beta[20001:120001]))
+plot(density(SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.025_T120000_1$gamma[20001:120001]))
+# ESS/s
+ESS(SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.025_T120000_1$beta[20001:120001])/(SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.025_T120000_1_time[[1]]*3600)
+ESS(SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.025_T120000_1$gamma[20001:120001])/(SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.025_T120000_1_time[[1]]*3600)
+# Posterior mean
+mean(SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.025_T120000_1$beta[20001:120001])
+mean(SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.025_T120000_1$gamma[20001:120001])
+# Posterior standard deviation
+sd(SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.025_T120000_1$beta[20001:120001])
+sd(SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.025_T120000_1$gamma[20001:120001])
+# check the number of draws in while/repeat loop until the acceptance condition is satisfied
+mean(SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.025_T120000_1$NumOfDrawsUntilAcceptance[20001:120001])
+plot(SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.025_T120000_1$NumOfDrawsUntilAcceptance[20001:120001],type="l")
+median(SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.025_T120000_1$NumOfDrawsUntilAcceptance[20001:120001])
+# check the number of accepted draws when the while/repeat loop stops
+mean(SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.025_T120000_1$NumOfAcceptedDrawsInEachNumCoresDraws[20001:120001])
+table(SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.025_T120000_1$NumOfAcceptedDrawsInEachNumCoresDraws[20001:120001])
+```
+
+Similar implementation and summary statistics can also be applied for the case when $p=0.01,0.005$.
+
+``` r
+## ABC-MCMC algorithm with approximate parallel computation p0.01
+NumCores <- detectCores()[1]-1
+cl <- parallel::makeCluster(NumCores)
+clusterExport(cl=cl, list("rStrauss", "square", "Kest")) # In order to use this function for parallel computation
+time_start <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.01_T120000_1 <-
+  S.G.Parallel.ABC.MCMC.Strauss(Y = SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY, beta0=190, gamma0=0.2,eps_beta=65, eps_gamma=0.16,
+                                lmCoefBeta = SS1_SPP_Pilot.lmCoefBeta, lmCoefGamma = SS1_SPP_Pilot.lmCoefGamma,
+                                Pilot.VarBeta = SS1_SPP_Pilot.VarBeta, Pilot.VarGamma = SS1_SPP_Pilot.VarGamma,
+                                eps = SS1_SPP_Pilot.0.01eps, R=SS1_SPP_R_hat, T=120000)
+time_end <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.01_T120000_1_time <- time_end-time_start
+stopCluster(cl)
+# Time difference of 3.880879 hours
+
+#--------------------------------------------------------------------------------------------------------------------------------------------
+## ABC-MCMC main algorithm with approximate parallel computation p0.005
+NumCores <- detectCores()[1]-1
+cl <- parallel::makeCluster(NumCores)
+clusterExport(cl=cl, list("rStrauss", "square", "Kest")) # In order to use this function for parallel computation
+time_start <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.005_T120000_1 <-
+  S.G.Parallel.ABC.MCMC.Strauss(Y = SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY, beta0=190, gamma0=0.2,eps_beta=65, eps_gamma=0.16,
+                                lmCoefBeta = SS1_SPP_Pilot.lmCoefBeta, lmCoefGamma = SS1_SPP_Pilot.lmCoefGamma,
+                                Pilot.VarBeta = SS1_SPP_Pilot.VarBeta, Pilot.VarGamma = SS1_SPP_Pilot.VarGamma,
+                                eps = SS1_SPP_Pilot.0.005eps, R=SS1_SPP_R_hat, T=120000)
+time_end <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.005_T120000_1_time <- time_end-time_start
+stopCluster(cl)
+# Time difference of 6.113184 hours
+```
+
+
+
+
+
+
 
