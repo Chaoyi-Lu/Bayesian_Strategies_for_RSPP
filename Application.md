@@ -113,8 +113,8 @@ Note here that the first element of the chain is the initial state $\theta^{(0)}
 
 ### The SS1 Implementation of the Exchange and Noisy M-H Algorithms
 
-Similar implementations are applied for the exchange and noisy M-H algorithms with $120000$ iterations.
-The noisy M-H algorithms are implemented from $k=2$ to $k=8$ where the $k=1$ case is equivalent to the exchange algorithm.
+Similar implementations are applied for the algorithm comparisons of the exchange and noisy M-H algorithms implemented for $120000$ iterations.
+The noisy M-H function `SPP_Parallel_Noisy_MH()` is implemented from $K=1$ to $K=8$ where the $K=1$ case is equivalent to the exchange algorithm.
 
 ``` r
 # # Exchange == Noisy M-H K1 0.12 million iterations
@@ -219,7 +219,7 @@ The summarizing processes are similar to the ground truth case shown above and w
 
 ### The SS1 Implementation of the ABC-MCMC Algorithm
 
-As discussed in section $4$ of the paper, the ABC-MCMC algorithm we make the comparisons with requires a pilot run to approximate the linear coefficients of the linear regression and to decide the acceptance thresholds.
+As we discussed in section $4$ of the paper, the ABC-MCMC algorithm we make the comparisons with requires a pilot run to approximate the linear coefficients of the linear regression and to decide the acceptance thresholds.
 We start from setting the $K$-function for the observation $\boldsymbol{y}$ with respect to $\hat{R}$, and setting the number of iterations in the pilot run.
 
 ``` r
@@ -230,8 +230,8 @@ SS1_SPP_Kfunc_Obs_R_hat <- SS1_SPP_Kfunc_Obs(SS1_SPP_R_hat)
 SS1_SPP_Pilot.L <- 10000
 ```
 
-Then we define a function to apply the pilot run and implement the parallel computation for it.
-Here the settings follow what we introduced in the simulation study section $6.1$ of the paper.
+Then we define a function to apply the pilot run and implement with parallel computation for it.
+Here the settings follow what we introduced in the simulation study section $6.1$ of the paper, that is, $\pi(\beta)=\text{U}(50, 400), \pi(\gamma)=\text{U}(0,1)$ and $R=\hat{R}$ we obtained by the profile pseudo-likelihood method illustrated above.
 
 ``` r
 # ABC-MCMC Pilot Draws Function
