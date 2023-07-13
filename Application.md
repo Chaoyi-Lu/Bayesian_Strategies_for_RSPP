@@ -24,7 +24,7 @@ Note further that, by setting $K=1$, the algorithm becomes the exchange algorith
 The parallel computation is implemented for the $K$ auxiliary draws.
 
 The function `S.G.ABC.MCMC.Strauss.repeat.draws()` implements one round of proposed draw for the SPP in the `repeat` loop of the ABC-MCMC algorithm proposed by [Shirota and Gelfand (2017)](https://doi.org/10.1080/10618600.2017.1299627) and returns the proposed states as well as the indicator of whether the corresponding $\Psi(\hat{\theta}',\hat{a})$ is smaller than the acceptance threshold $\epsilon$.
-The function `S.G.Parallel.ABC.MCMC.Strauss()` apply the implementation of the ABC-MCMC algorithm with the approximate parallel computation discussed in section $4$ of the paper.
+The function `S.G.Parallel.ABC.MCMC.Strauss()` apply the implementation of the ABC-MCMC algorithm for SPP with the approximate parallel computation discussed in section $4$ of the paper.
 
 We start from the process of generating the artificial data used in the SPP simulation study where we set $\beta = 200, \gamma = 0.1$ and $R = 0.05$ on $S = [0,1]\times[0,1]$.
 
@@ -464,13 +464,13 @@ SS2_dppG_Tau100_Sigma0.05_ObsY <- ppp(SS2_dppG_Tau100_Sigma0.05_ObsY[,1],SS2_dpp
 ```
 
 The `dppG_logDensity()` function in the [`Algorithm_Functions_for_RSPP.R`] evaluates the log density of the $\hat{X}_S$ without the normalising constant.
-The `dppG_MH()` function implements the Metropolis-Hastings algorithm due to the tractability of the likelihood normalising term of the $\hat{X}_S$.
+The `dppG_MH()` function implements the Metropolis-Hastings algorithm for the dppG due to the tractability of the likelihood normalising term of the $\hat{X}_S$.
 The function `dppG_Noisy_E_kth_Ratio()`, which is similar as that in SPP cases, calculates the unnormalised likelihood ratio $\frac{q(x_n'|\theta^{(t-1)})}{q(x_n'|\theta')}$ for noisy M-H algorithm.
-The function `dppG_Parallel_Noisy_MH()` implements the exchange or the noisy M-H algorithm with parallel computation.
+The function `dppG_Parallel_Noisy_MH()` implements the exchange or the noisy M-H algorithm for dppG with parallel computation.
 
 Recall here that we propose to apply an approximation of the unnormalised likelihood function for $\hat{X}_S$ in order to improve the efficiency.
 The functions `Approx_dppG_Noisy_E_kth_Ratio()` and `Approx_dppG_Parallel_Noisy_MH()` corresponds to the approximate exchange and noisy M-H algorithms.
-The ABC-MCMC functions `S.G.ABC.MCMC.dppG.repeat.draws()` and `S.G.Parallel.ABC.MCMC.dppG()` are similar as those of SPP cases and the only difference is that the summary statistic $\boldsymbol{\eta_2}$ is now evaluated at $10$ equally spaced $r_i$'s from $i=1$ to $i=10$ as we discussed in the end of section $5$ of the paper.
+The ABC-MCMC functions for dppG, `S.G.ABC.MCMC.dppG.repeat.draws()` and `S.G.Parallel.ABC.MCMC.dppG()`, are similar as those of SPP cases and the only difference is that the summary statistic $\boldsymbol{\eta_2}$ is now evaluated at $10$ equally spaced $r_i$'s from $i=1$ to $i=10$ as we discussed in the end of section $5$ of the paper.
 
 The ground truth in this dppG simulation study is to implement the M-H algorithm for $120000$ iterations with $20000$ burn-in.
 
