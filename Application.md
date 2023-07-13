@@ -43,7 +43,8 @@ SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY <- as.matrix(read.csv("SS1_SPP_Beta200_Gamma
 SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY  <- ppp(SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY[,1],SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY[,2]) # transform to point pattern class
 ```
 
-Then we can obtain the estimated interaction radius $R$ by the profile pseudo-likelihood method
+Then we can obtain the estimated interaction radius $R$ by the profile pseudo-likelihood method.
+It can be checked that the estimation $\hat{R}=0.0508$
 
 ``` r
 ## profile pseudo-likelihood method, i.e. maximum pseudo-likelihood calculated at r
@@ -67,6 +68,7 @@ par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42),mgp=c(3,1,0))
 ```
 
 The ground truth implementation is to apply the exchange algorithm for $1200000$ iterations as follows.
+The initial states are set as $\beta_0=190,\gamma_0=0.2$ and the proposal epsilons are tuned to be $\epsilon_{\beta}=65, \epsilon_{\gamma}=0.16$.
 
 ``` r
 # Exchange Ground Truth
@@ -258,7 +260,7 @@ stopCluster(cl)
 The corresponding reference implementation time of the pilot run is also provided.
 However, it can be neglected if we compare to the time taken by the main algorithm of the ABC-MCMC algorithm and thus it was not counted in the comparisons.
 Due to the fact that the parallel computation code returns a list each element of which further contains a list of outputs from each iteration of the pilot run.
-We need to extract each single chain of parameter by the following code.
+We need to extract each single chain of the parameter by the following code.
 
 ``` r
 # Transform pilot draws to single chains of parameters
@@ -297,7 +299,7 @@ SS1_SPP_Pilot.psi <- ((SS1_SPP_Pilot.eta%*%SS1_SPP_Pilot.lmCoefBeta[2:3])^2)/SS1
   ((SS1_SPP_Pilot.eta%*%SS1_SPP_Pilot.lmCoefGamma[2:3])^2)/SS1_SPP_Pilot.VarGamma
 ```
 
-We specify three different percentiles for the acceptance thresholds $\epsilon$.
+We specify three different percentiles for the acceptance thresholds $\epsilon$ in this simulation study.
 
 ``` r
 # Take p percentile
@@ -327,8 +329,8 @@ stopCluster(cl)
 # Time difference of 2.401528 hours
 ```
 
-Similar as what we do for the exchange and noisy M-H algorithms, we can obtain the summarized statistics of the outputs as following.
-Note here that we further monitor the number of draws in `repeat` loop until the acceptance condition is satisfied.
+Similar as the exchange and noisy M-H algorithms experiments, we can obtain the summarized statistics of the outputs as follows.
+Note here that we further monitor the number of draws in the `repeat` loop until the acceptance condition is satisfied.
 And we also monitor whether there are more than one draws which satisfy the the acceptance condition within one round of $J$ parallel draws.
 
 ``` r
@@ -359,7 +361,7 @@ mean(SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.025_T120000_1$NumOfAcceptedDrawsI
 table(SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.025_T120000_1$NumOfAcceptedDrawsInEachNumCoresDraws[20001:120001])
 ```
 
-Similar implementation and summary statistics can also be applied for the case when $p=0.01,0.005$.
+Similar implementation and summary statistics can also be applied for the case where $p=0.01$ and $p=0.005$.
 
 ``` r
 ## ABC-MCMC algorithm with approximate parallel computation p0.01
@@ -452,7 +454,7 @@ par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42),mgp=c(3,1,0))
 ## Determinantal Point Process with A Gaussian Kernel Simulation Study $2$
 
 We illustrate the code and plots for our second determinantal point Process with a Gaussian Kernel (dppG) in this simulation study 2 (SS2).
-Again we start from the generation of the artificial data from the dppG with the settings applied in the section $6.2$ of the paper.
+Again we start from the generation of the artificial data from the dppG with the settings applied in the section $6.2$ of the paper, that is, $\tau = 100, \sigma = 0.05$.
 
 ``` r
 ## Generate from dppG
@@ -474,6 +476,7 @@ The functions `Approx_dppG_Noisy_E_kth_Ratio()` and `Approx_dppG_Parallel_Noisy_
 The ABC-MCMC functions for dppG, `S.G.ABC.MCMC.dppG.repeat.draws()` and `S.G.Parallel.ABC.MCMC.dppG()`, are similar as those of SPP cases and the only difference is that the summary statistic $\boldsymbol{\eta_2}$ is now evaluated at $10$ equally spaced $r_i$'s from $i=1$ to $i=10$ as we discussed in the end of section $5$ of the paper.
 
 The ground truth in this dppG simulation study is to implement the M-H algorithm for $120000$ iterations with $20000$ burn-in.
+The initial states are set as $\tau_0=125,\sigma_0=0.04$ and the proposal epsilons are tuned to be $\epsilon_{\tau}=32, \epsilon_{\sigma}=0.015$.
 
 ``` r
 # MH algorithm dppG Ground Truth
@@ -485,6 +488,8 @@ time_end <- Sys.time()
 SS2_dppG_Tau100_Sigma0.05_MH_T120000_1_time <- time_end-time_start
 # Time difference of 1.980805 days
 ```
+
+It can be seen that the implementation time is much longer than the SPP cases even though the number of iterations is much less than that of the SS1.
 
 ### The SS2 Implementation of the M-H Algorithm
 
@@ -501,7 +506,7 @@ SS2_dppG_Tau100_Sigma0.05_MH_T12000_1_time <- time_end-time_start
 # Time difference of 5.498604 hours
 ```
 
-Due to the fact that the code for summary statistics are similar as that of SPP cases, we skip the code for summary statistics for all the following implementations.
+Due to the fact that the code for summary statistics are similar as that of the SPP cases, we propose not to show amount of the repeated code of the summary statistics for all the following implementations.
 The implementation code for the exchange, noisy M-H, approximate exchange, approximate noisy M-H algorithms are also similar as those of SPP cases as shown below.
 
 ### The SS2 Implementations of the Exchange and Noisy M-H Algorithms
@@ -614,6 +619,9 @@ stopCluster(cl)
 ### The SS2 Implementation of the ABC-MCMC Algorithm
 
 The code for the pilot run of the ABC-MCMC algorithm for dppG is shown as below.
+Note here that the pilot sampling of the parameter $\tau$ follows the prior distribution $\pi(\tau)=\text{U}(50, 200)$.
+Though the prior distribution of $\sigma$ is proposed to be $\pi(\sigma)=\text{U}(0.001,1/\sqrt{10\pi})$, the existance of the dppG restricts the parameter $\sigma$ to be bounded by $1/\sqrt{\tai\pi}$.
+Moreover, the $10$ equally spaced $r_i$'s from $i=1$ to $i=10$ are specified here by the code `r_M <- seq(0.01,0.1,0.01)`.
 
 ``` r
 # obtain Kfunc for Y
@@ -704,7 +712,7 @@ stopCluster(cl)
 # Time difference of 21.44336 hours
 ```
 
-The location plot Figure $4$ in section $6.2$ can be recovered by the following code.
+The plot of the point locations of the SS2 aritificial dataset shown as Figure $4$ in section $6.2$ can be recovered by the following code.
 
 ```r
 par(mfrow=c(1,1),mai = c(0.5, 0.5, 0.5, 0.5),mgp=c(1.25,0.45,0))
@@ -713,7 +721,7 @@ title(main = "", mgp=c(1,0.25,0),cex.main=1,cex.lab = 0.8)
 par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42),mgp=c(3,1,0))
 ```
 
-The trace plots Figure $5$ can be recovered by:
+The trace plots of the outputs for the algorithms shown as Figure $5$ can be recovered by:
 
 ```r
 par(mfrow=c(2,6),mai = c(0.15, 0.15, 0.15, 0.01),mgp=c(0.75,0.25,0))
@@ -733,7 +741,7 @@ plot(SS2_dppG_Tau100_Sigma0.05_ABCMCMC_p0.005_T12000_1$sigma[2001:12001], type =
 par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42),mgp=c(3,1,0))
 ```
 
-The density plot Figure $6$ can be recovered by:
+The posterior density plot Figure $6$ can be recovered by:
 
 ```r
 par(mfrow=c(1,2),mai = c(0.25, 0.25, 0.25, 0.05),mgp=c(1.25,0.25,0))
@@ -763,7 +771,7 @@ par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42),mgp=c(3,1,0))
 
 ## Real Data Application
 
-Recall here that we apply the algorithm comparisons by fitting Strauss point process model to the Duke Forest dataset processed by [Shirota and Gelfand (2017)](https://doi.org/10.1080/10618600.2017.1299627).
+Recall here that we apply the algorithm comparisons by fitting the Strauss point process model to the Duke Forest dataset processed by [Shirota and Gelfand (2017)](https://doi.org/10.1080/10618600.2017.1299627).
 The dataset can be found in the link above as well as the `RealF_Data.csv` provided with this GitHub page.
 The data can be loaded by the code:
 
@@ -773,7 +781,7 @@ duke_forest<-data.frame(read.csv("RealF_Data.csv",header=T))
 colnames(duke_forest) <- c("x","y")
 ```
 
-The profile pseudo-likelihood method is also applied in the similar way as SPP simulation study.
+The profile pseudo-likelihood method is applied in the similar way as in [Shirota and Gelfand (2017)](https://doi.org/10.1080/10618600.2017.1299627).
 
 ```r
 ## profile pseudo-likelihood method, i.e. maximum pseudo-likelihood calculated at r
