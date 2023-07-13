@@ -44,7 +44,7 @@ SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY  <- ppp(SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY[
 ```
 
 Then we can obtain the estimated interaction radius $R$ by the profile pseudo-likelihood method.
-It can be checked that the estimation $\hat{R}=0.0508$
+It can be checked that the estimation $\hat{R}=0.0508$.
 
 ``` r
 ## profile pseudo-likelihood method, i.e. maximum pseudo-likelihood calculated at r
@@ -782,6 +782,7 @@ colnames(duke_forest) <- c("x","y")
 ```
 
 The profile pseudo-likelihood method is applied in the similar way as in [Shirota and Gelfand (2017)](https://doi.org/10.1080/10618600.2017.1299627).
+The estimated $\hat{R}=0.053$.
 
 ```r
 ## profile pseudo-likelihood method, i.e. maximum pseudo-likelihood calculated at r
@@ -812,9 +813,10 @@ In this real data application we apply the same experiments as we implemented in
 In order to make everything clear enough, we modify the functions used in SPP simulation study and obtain the corresponding specific functions for the real data applications.
 The function `df_SPP_Parallel_Noisy_MH()` is the exchange or noisy M-H algorithm implementation of fitting SPP model to the real Duke Forest (df) dataset with parallel computation.
 The function `df.S.G.Parallel.ABC.MCMC.Strauss()` is the ABC-MCMC implementation with approximate parallel computation.
-If we compare with the functions `SPP_Parallel_Noisy_MH()` and `S.G.ABC.MCMC.Strauss.repeat.draws()`, the only difference is the prior and bound proposal settings.
+If we compare with the functions `SPP_Parallel_Noisy_MH()` and `S.G.ABC.MCMC.Strauss.repeat.draws()`, the only difference is the prior and bound proposal settings, that is, $\pi(\beta)=\text{U}(50,350)$ and $\pi(\gamma)=\text{U}(0,1)$.
 
 The ground truth is to implement exchange algorithm for $1200000$ iterations with $200000$-iteration burn-in.
+The initial states of all the implementations below are set as $\beta_0=190,\gamma_0=0.2$, and the proposal epsilons are tuned to be $\epsilon_{\beta}=50, \epsilon_{\gamma}=0.23$.
 
 ```r
 # Exchange Ground truth
@@ -831,7 +833,7 @@ RDA_SPP_NoisyMH_K1_T1200000_1_time <- time_end-time_start
 
 ### The RDA Implementations of the Exchange and Noisy M-H Algorithms
 
-The algorithm comparison implementations for the exchange and noisy M-H algorithms are shown below by implementing the function `df_SPP_Parallel_Noisy_MH()` for $120000$ iterations from $K=1$ to $K=8$.
+The implementations of the algorithm comparisons for the exchange and noisy M-H algorithms are shown below by implementing the function `df_SPP_Parallel_Noisy_MH()` for $120000$ iterations from $K=1$ to $K=8$.
 
 ```r
 # # Exchange == Noisy MH K1 0.12 million iterations
@@ -926,6 +928,7 @@ stopCluster(cl)
 ### The RDA Implementation of the ABC-MCMC Algorithm
 
 The pilot run for the real data applications is shown below.
+The process is exactly the same as SS1 pilot run except the prior settings.
 Here we consider $p=0.025, 0.01$ and $0.005$ again in this experiment.
 
 ```r
@@ -983,7 +986,7 @@ RDA_SPP_Pilot.0.01eps <- quantile(RDA_SPP_Pilot.psi,probs=0.01)[[1]]
 RDA_SPP_Pilot.0.025eps <- quantile(RDA_SPP_Pilot.psi,probs=0.025)[[1]]
 ```
 
-The implementations of main ABC-MCMC algorithm for all the three different $p$ cases are following.
+The implementations of the main ABC-MCMC algorithm for all the three different $p$ cases are following.
 
 ```r
 ## ABC-MCMC algorithm with approximate parallel computation p0.025
@@ -1092,7 +1095,7 @@ legend("topright", legend=c("GT","Ex","NMH K2","ABC p0.5"),
 par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42),mgp=c(3,1,0))
 ```
 
-If we construct the Table $3$ shown in section $7$ of the paper in the `R` code and store it in `RDA_SPP_comparison_table`, the Figure $10$ of the paper can be recovered by the following code.
+If we construct the Table $3$ shown in section $7$ of the paper in the `R` code, and store it as `RDA_SPP_comparison_table` in the enviroment, the Figure $10$ of the paper can be recovered by the following code.
 
 ```r
 par(mfrow=c(1,2),mai = c(0.25, 0.25, 0.25, 0.05),mgp=c(1.25,0.25,0))
@@ -1115,7 +1118,7 @@ legend("topright", legend=c("NMH Different K Cases", "ABC-MCMC p2.5", "ABC-MCMC 
 par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42),mgp=c(3,1,0))
 ```
 
-Since the code for constructing the table `RDA_SPP_comparison_table` requires hunreds of lines to summarize the outputs and integrate all the summary statistics together.
+Since the code for constructing the table `RDA_SPP_comparison_table` requires hundreds of lines to summarize the outputs and to integrate all the summary statistics together.
 We propose not to provide more details here in order not to make this page too lengthy.
 
 
