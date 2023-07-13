@@ -10,6 +10,7 @@ source("Algorithm_Functions_for_RSPP.R")
 library(spatstat) # For point processes simulations and related application
 library(doParallel) # For parallel computation
 library(LaplacesDemon) # For ESS() and logdet() function
+library(latex2exp) # For mathematics symbol in the plot
 ```
 
 The explanations of each function and almost each line of the code in [`Algorithm_Functions_for_RSPP.R`] are provided in the corresponding comments in the file.
@@ -50,7 +51,7 @@ SS1_SPP_pplmStrauss$fit
 SS1_SPP_R_hat <- SS1_SPP_pplmStrauss$fit$interaction$par$r # Store the estimated R
 ```
 
-And the code below provides the plot of the point pocations and the profile pseudo-likelihood plot shown in SPP simulation study of the paper.
+And the code below provides the plot of the point locations and the profile pseudo-likelihood plot shown as Figure $1$ in SPP simulation study of the paper.
 
 ``` r
 par(mfrow=c(1,2),mai = c(0.55, 0.5, 0.25, 0.05),mgp=c(1.25,0.45,0))
@@ -392,7 +393,60 @@ stopCluster(cl)
 # Time difference of 6.113184 hours
 ```
 
+The simulation study $1$ boxplots Figure $2$ can be recovered via the code provided below.
 
+``` r
+par(mfrow=c(1,2),mai = c(0.3, 0.3, 0.05, 0.01),mgp=c(0.45,0.3,0))
+boxplot(SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K1_T1200000_1$beta[200001:1200001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K1_T120000_1$beta[20001:120001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K2_T120000_1$beta[20001:120001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K3_T120000_1$beta[20001:120001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K4_T120000_1$beta[20001:120001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K5_T120000_1$beta[20001:120001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K6_T120000_1$beta[20001:120001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K7_T120000_1$beta[20001:120001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K8_T120000_1$beta[20001:120001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.025_T120000_1$beta[20001:120001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.01_T120000_1$beta[20001:120001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.005_T120000_1$beta[20001:120001],
+        xlab = "",ylab = "", main = "",cex.axis = 0.6)
+title(xlab = "",ylab = TeX(r'($\beta$)'), main = "", mgp=c(0.45,0.3,0),cex.main=1,cex.lab = 0.8)
+axis(1, at=c(1:12), labels = c("GT","Ex","K2","K3","K4","K5","K6","K7","K8","p2.5","p1","p0.5"),cex.axis=0.6)
+abline(h=median(SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K1_T1200000_1$beta[200001:1200001]),col = 2,lty = 2)
+
+boxplot(SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K1_T1200000_1$gamma[200001:1200001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K1_T120000_1$gamma[20001:120001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K2_T120000_1$gamma[20001:120001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K3_T120000_1$gamma[20001:120001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K4_T120000_1$gamma[20001:120001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K5_T120000_1$gamma[20001:120001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K6_T120000_1$gamma[20001:120001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K7_T120000_1$gamma[20001:120001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K8_T120000_1$gamma[20001:120001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.025_T120000_1$gamma[20001:120001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.01_T120000_1$gamma[20001:120001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.005_T120000_1$gamma[20001:120001],
+        xlab = "",ylab = "", main = "",cex.axis = 0.6)
+title(xlab = "",ylab = TeX(r'($\gamma$)'), main = "", mgp=c(0.45,0.3,0),cex.main=1,cex.lab = 0.8)
+axis(1, at=c(1:12), labels = c("GT","Ex","K2","K3","K4","K5","K6","K7","K8","p2.5","p1","p0.5"),cex.axis=0.6)
+abline(h=median(SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K1_T1200000_1$gamma[200001:1200001]),col = 2,lty = 2)
+par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42),mgp=c(3,1,0))
+```
+
+The code for the simulation study $1$ Figure $3$ is also shown here.
+
+``` r
+par(mfrow=c(1,3),mai = c(0.3, 0.3, 0.25, 0.05),mgp=c(1.25,0.45,0))
+plot(SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.025_T120000_2$NumOfDrawsUntilAcceptance[20001:120001],type="l",xlab="",ylab="")
+title(main = "ABC-MCMC p2.5", mgp=c(1,0.25,0),cex.main=1,cex.lab = 0.8)
+
+plot(SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.01_T120000_2$NumOfDrawsUntilAcceptance[20001:120001],type="l",xlab="",ylab="")
+title(main = "ABC-MCMC p1", mgp=c(1,0.25,0),cex.main=1,cex.lab = 0.8)
+
+plot(SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.005_T120000_2$NumOfDrawsUntilAcceptance[20001:120001],type="l",xlab="",ylab="")
+title(main = "ABC-MCMC p0.5", mgp=c(1,0.25,0),cex.main=1,cex.lab = 0.8)
+par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42),mgp=c(3,1,0))
+```
 
 
 
