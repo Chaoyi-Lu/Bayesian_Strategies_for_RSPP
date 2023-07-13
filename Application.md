@@ -13,7 +13,7 @@ library(LaplacesDemon) # For ESS() and logdet() function
 library(latex2exp) # For mathematics symbol in the plot
 ```
 
-The explanations of each function and almost each line of the code in [`Algorithm_Functions_for_RSPP.R`] are provided in the corresponding comments in the file.
+The explanations of the functions in the file [`Algorithm_Functions_for_RSPP.R`] are provided in the corresponding comments in the file.
 
 ## Strauss Point Process Simulation Study $1$
 
