@@ -712,7 +712,7 @@ title(main = "", mgp=c(1,0.25,0),cex.main=1,cex.lab = 0.8)
 par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42),mgp=c(3,1,0))
 ```
 
-The trace plot Figure $5$ can be recovered by:
+The trace plots Figure $5$ can be recovered by:
 
 ```r
 par(mfrow=c(2,6),mai = c(0.15, 0.15, 0.15, 0.01),mgp=c(0.75,0.25,0))
@@ -759,5 +759,47 @@ legend("topleft", legend=c("GT","MH","Ex","NMH K2",TeX(r'(Ex$^{app}$)'),TeX(r'(N
        col=c(1:8), lty = 1, cex=0.6)
 par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42),mgp=c(3,1,0))
 ```
+
+## Real Data Application
+
+Recall here that we apply the algorithm comparisons by fitting Strauss point process model to the Duke Forest dataset processed by [Shirota and Gelfand (2017)](https://doi.org/10.1080/10618600.2017.1299627).
+The dataset can be found in the link above as well as the `RealF_Data.csv` provided with this GitHub page.
+The data can be loaded by the code:
+
+```r
+# Real Duke Forest dataset processed by Shirota and Gelfand (2017)
+duke_forest<-data.frame(read.csv("RealF_Data.csv",header=T))
+colnames(duke_forest) <- c("x","y")
+```
+
+The profile pseudo-likelihood method is also applied in the similar way as SPP simulation study.
+
+```r
+## profile pseudo-likelihood method, i.e. maximum pseudo-likelihood calculated at r
+RDA_SPP_pplmStrauss <- profilepl(data.frame(r=seq(0.01,0.1, by=0.001)), Strauss, ppp(duke_forest$x,duke_forest$y)) # The same setting as Shirota & Gelfand (2017)
+RDA_SPP_pplmStrauss$fit
+RDA_SPP_R_hat <- RDA_SPP_pplmStrauss$fit$interaction$par$r
+plot(RDA_SPP_pplmStrauss$param[,1],RDA_SPP_pplmStrauss$prof,type = "l",xlab = "R",ylab = "log PL")
+abline(v=RDA_SPP_pplmStrauss$fit$interaction$par$r,col = 2,lty = 2)
+```
+
+The plots of the tree positions of the real dataset and the profile pseudo-likelihood shown as Figure $7$ in real data application section $7$ of the paper can be recovered by the following code.
+
+```r
+par(mfrow=c(1,2),mai = c(0.5, 0.5, 0.25, 0.05),mgp=c(1.25,0.45,0))
+plot(duke_forest$x,duke_forest$y,xlab = "",ylab = "")
+title(main = "", mgp=c(1,0.25,0),cex.main=1,cex.lab = 0.8)
+
+plot(RDA_SPP_pplmStrauss$param[,1],RDA_SPP_pplmStrauss$prof,type = "l",xlab = "R",ylab = "log PL")
+abline(v=RDA_SPP_pplmStrauss$fit$interaction$par$r,col = 2,lty = 2)
+title(main = "", mgp=c(1,0.25,0),cex.main=1,cex.lab = 0.6)
+par(xpd=TRUE)
+text(0.053,204, TeX(r'($\hat{R}=0.053$)'), pos = 4,col=2)
+par(xpd=FALSE)
+par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42),mgp=c(3,1,0))
+```
+
+In this real data application we 
+
 
 
