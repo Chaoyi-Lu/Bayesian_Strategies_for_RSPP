@@ -437,18 +437,39 @@ The code for the simulation study $1$ Figure $3$ is also shown here.
 
 ``` r
 par(mfrow=c(1,3),mai = c(0.3, 0.3, 0.25, 0.05),mgp=c(1.25,0.45,0))
-plot(SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.025_T120000_2$NumOfDrawsUntilAcceptance[20001:120001],type="l",xlab="",ylab="")
+plot(SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.025_T120000_1$NumOfDrawsUntilAcceptance[20001:120001],type="l",xlab="",ylab="")
 title(main = "ABC-MCMC p2.5", mgp=c(1,0.25,0),cex.main=1,cex.lab = 0.8)
 
-plot(SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.01_T120000_2$NumOfDrawsUntilAcceptance[20001:120001],type="l",xlab="",ylab="")
+plot(SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.01_T120000_1$NumOfDrawsUntilAcceptance[20001:120001],type="l",xlab="",ylab="")
 title(main = "ABC-MCMC p1", mgp=c(1,0.25,0),cex.main=1,cex.lab = 0.8)
 
-plot(SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.005_T120000_2$NumOfDrawsUntilAcceptance[20001:120001],type="l",xlab="",ylab="")
+plot(SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.005_T120000_1$NumOfDrawsUntilAcceptance[20001:120001],type="l",xlab="",ylab="")
 title(main = "ABC-MCMC p0.5", mgp=c(1,0.25,0),cex.main=1,cex.lab = 0.8)
 par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42),mgp=c(3,1,0))
 ```
 
+## Determinantal Point Process with A Gaussian Kernel Simulation Study
 
+In this section, we illustrate the code and plots for our second determinantal point Process with a Gaussian Kernel (dppG) Simulation Study.
+Again we start from the generation of the artificial data from the dppG with the settings applied in the section $6.2$ of the paper.
 
+``` r
+## Generate from dppG
+dppG_Y_observation <- simulate(dppGauss(lambda=100, alpha=0.05, d=2))
+# utils::write.table(x=dppG_Y_observation,file="SS2_dppG_Tau100_Sigma0.05_ObsY.csv", sep="," , row.names = FALSE, col.names=FALSE)
+
+## Simulation study 2 observation
+SS2_dppG_Tau100_Sigma0.05_ObsY <- as.matrix(read.csv("SS2_dppG_Tau100_Sigma0.05_ObsY.csv",header=FALSE))
+SS2_dppG_Tau100_Sigma0.05_ObsY <- ppp(SS2_dppG_Tau100_Sigma0.05_ObsY[,1],SS2_dppG_Tau100_Sigma0.05_ObsY[,2]) # transform to point pattern
+```
+
+The `dppG_logDensity()` function in the [`Algorithm_Functions_for_RSPP.R`] evaluates the log density of the $\hat{X}_S$ without the normalising constant.
+The `dppG_MH()` function implements the Metropolis-Hastings algorithm due to the tractability of the likelihood normalising term of the $\hat{X}_S$.
+The function `dppG_Noisy_E_kth_Ratio()`, which is similar as that in SPP cases, calculates the unnormalised likelihood ratio $\frac{q(x_n'|\theta^{(t-1)})}{q(x_n'|\theta')}$ for noisy M-H algorithm.
+The function `dppG_Parallel_Noisy_MH()` implements the exchange or the noisy M-H algorithm with parallel computation.
+
+Recall here that we propose to apply an approximation of the unnormalised likelihood function for $\hat{X}_S$ in order to improve the efficiency.
+The functions `Approx_dppG_Noisy_E_kth_Ratio()` and `Approx_dppG_Parallel_Noisy_MH()` corresponds to the approximate exchange and noisy M-H algorithms.
+The ABC-MCMC functions `S.G.ABC.MCMC.dppG.repeat.draws()` and `S.G.Parallel.ABC.MCMC.dppG()` are similar as those of SPP cases and the only difference is that the summary statistic $\boldsymbol{\eta_2}$ is now evaluated at $10$ equally spaced $r_i$'s from $i=1$ to $i=10$ as we discussed in the end of section $5$ of the paper.
 
 
