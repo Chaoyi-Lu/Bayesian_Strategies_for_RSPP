@@ -67,7 +67,7 @@ par(xpd=FALSE)
 par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42),mgp=c(3,1,0))
 ```
 
-The ground truth implementation is to apply the exchange algorithm for $1200000$ iterations as follows.
+The ground truth implementation is to apply the exchange algorithm for $1,200,000$ iterations as follows.
 The initial states are set as $\beta_0=190,\gamma_0=0.2$ and the proposal epsilons are tuned to be $\epsilon_{\beta}=65, \epsilon_{\gamma}=0.16$.
 
 ``` r
@@ -111,7 +111,7 @@ sd(SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K1_T1200000_1$beta[200001:1200001])
 sd(SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K1_T1200000_1$gamma[200001:1200001])
 ```
 
-Note here that the first element of the chain is the initial state $\theta^{(0)}$ and thus we need to drop the first $200001$ iterations in order for the $200000$ burn-in.
+Note here that the first element of the chain is the initial state $\theta^{(0)}$ and thus we need to drop the first $200,001$ iterations in order for the $200,000$ burn-in.
 
 ### The SS1 Implementation of the Exchange and Noisy M-H Algorithms
 
@@ -475,7 +475,7 @@ Recall here that we propose to apply an approximation of the unnormalised likeli
 The functions `Approx_dppG_Noisy_E_kth_Ratio()` and `Approx_dppG_Parallel_Noisy_MH()` corresponds to the approximate exchange and noisy M-H algorithms.
 The ABC-MCMC functions for dppG, `S.G.ABC.MCMC.dppG.repeat.draws()` and `S.G.Parallel.ABC.MCMC.dppG()`, are similar as those of SPP cases and the only difference is that the summary statistic $\boldsymbol{\eta_2}$ is now evaluated at $10$ equally spaced $r_i$'s from $i=1$ to $i=10$ as we discussed in the end of section $5$ of the paper.
 
-The ground truth in this dppG simulation study is to implement the M-H algorithm for $120000$ iterations with $20000$ burn-in.
+The ground truth in this dppG simulation study is to implement the M-H algorithm for $120,000$ iterations with $20,000$ burn-in.
 The initial states are set as $\tau_0=125,\sigma_0=0.04$ and the proposal epsilons are tuned to be $\epsilon_{\tau}=32, \epsilon_{\sigma}=0.015$.
 
 ``` r
@@ -493,7 +493,7 @@ It can be seen that the implementation time is much longer than the SPP cases ev
 
 ### The SS2 Implementation of the M-H Algorithm
 
-Similarly the M-H algorithm can also be implemented for $12000$ iterations with $2000$ iteration burn-in for the algorithm comparisons.
+Similarly the M-H algorithm can also be implemented for $12,000$ iterations with $2000$ iteration burn-in for the algorithm comparisons.
 
 ``` r
 # MH algorithm dppG 12000 iteration
@@ -815,7 +815,7 @@ The function `df_SPP_Parallel_Noisy_MH()` is the exchange or noisy M-H algorithm
 The function `df.S.G.Parallel.ABC.MCMC.Strauss()` is the ABC-MCMC implementation with approximate parallel computation.
 If we compare with the functions `SPP_Parallel_Noisy_MH()` and `S.G.ABC.MCMC.Strauss.repeat.draws()`, the only difference is the prior and bound proposal settings, that is, $\pi(\beta)=\text{U}(50,350)$ and $\pi(\gamma)=\text{U}(0,1)$.
 
-The ground truth is to implement exchange algorithm for $1200000$ iterations with $200000$-iteration burn-in.
+The ground truth is to implement exchange algorithm for $1,200,000$ iterations with $200,000$-iteration burn-in.
 The initial states of all the implementations below are set as $\beta_0=190,\gamma_0=0.2$, and the proposal epsilons are tuned to be $\epsilon_{\beta}=50, \epsilon_{\gamma}=0.23$.
 
 ```r
@@ -833,7 +833,7 @@ RDA_SPP_NoisyMH_K1_T1200000_1_time <- time_end-time_start
 
 ### The RDA Implementations of the Exchange and Noisy M-H Algorithms
 
-The implementations of the algorithm comparisons for the exchange and noisy M-H algorithms are shown below by implementing the function `df_SPP_Parallel_Noisy_MH()` for $120000$ iterations from $K=1$ to $K=8$.
+The implementations of the algorithm comparisons for the exchange and noisy M-H algorithms are shown below by implementing the function `df_SPP_Parallel_Noisy_MH()` for $120,000$ iterations from $K=1$ to $K=8$.
 
 ```r
 # # Exchange == Noisy MH K1 0.12 million iterations
