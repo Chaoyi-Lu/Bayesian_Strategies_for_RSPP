@@ -620,7 +620,7 @@ stopCluster(cl)
 
 The code for the pilot run of the ABC-MCMC algorithm for dppG is shown as below.
 Note here that the pilot sampling of the parameter $\tau$ follows the prior distribution $\pi(\tau)=\text{U}(50, 200)$.
-Though the prior distribution of $\sigma$ is proposed to be $\pi(\sigma)=\text{U}(0.001,1/\sqrt{10\pi})$, the existance of the dppG restricts the parameter $\sigma$ to be bounded by $1/\sqrt{\tai\pi}$.
+Though the prior distribution of $\sigma$ is proposed to be $\pi(\sigma)=\text{U}(0.001,1/\sqrt{10\pi})$, the existance of the dppG restricts the parameter $\sigma$ to be bounded by $1/\sqrt{\tau\pi}$.
 Moreover, the $10$ equally spaced $r_i$'s from $i=1$ to $i=10$ are specified here by the code `r_M <- seq(0.01,0.1,0.01)`.
 
 ``` r
