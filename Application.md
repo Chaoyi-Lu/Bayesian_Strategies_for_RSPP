@@ -303,7 +303,9 @@ SS1_SPP_Pilot.psi <- ((SS1_SPP_Pilot.eta%*%SS1_SPP_Pilot.lmCoefBeta[2:3])^2)/SS1
 ```
 
 We specify three different percentiles for the acceptance thresholds $\epsilon$ in this simulation study.
-Note here that the notation $p^\*$ in this code page indicate the $p^\*$ percentile (for example, $p^\*=0.025, 0.01, 0.005$) instead of the $p$ percent percentile (for example, $p=2.5, 1, 0.5$) we discussed in the section $4$ of the paper.
+In this GitHub code page, Let's denote $p$ as the $p$ percentile (for example, $p=0.025, 0.01, 0.005$). 
+And we denote $p^\*$ as the $p^\*$ percent percentile (for example, $p^\*=2.5, 1, 0.5$) which is the notation we used in the section $4$ of the paper.
+Instead of $p^\*$, we propose to mainly use $p$ in this file.
 
 ``` r
 # Take p percentile
