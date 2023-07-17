@@ -17,7 +17,7 @@ The explanations of the functions in the file [`Algorithm_Functions_for_RSPP.R`]
 
 ## Strauss Point Process Simulation Study $1$
 
-Note that the function `Noisy_E_kth_Ratio()` corresponds to the $k$ th auxiliary draw of the noisy Metropolis-Hastings (noisy M-H) algorithm as well as the corresponding evaluation of the unnormalised likelihood ratio $\frac{q(x_n'|\theta^{(t-1)})}{q(x_n'|\theta')}$. 
+The function `Noisy_E_kth_Ratio()` corresponds to the $k$ th auxiliary draw of the noisy Metropolis-Hastings (noisy M-H) algorithm as well as the corresponding evaluation of the unnormalised likelihood ratio $\frac{q(x_n'|\theta^{(t-1)})}{q(x_n'|\theta')}$. 
 The function `SPP_Parallel_Noisy_MH()` is the noisy M-H algorithm implemented for the Strauss point process (SPP) in this simulation study 1 (SS1).
 The input $K$ is the fixed number of auxiliary draws.
 Note further that, by setting $K=1$, the algorithm becomes the exchange algorithm.
