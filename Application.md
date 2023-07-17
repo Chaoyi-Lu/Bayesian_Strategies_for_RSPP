@@ -24,7 +24,7 @@ Note that, by setting $K=1$, the noisy M-H algorithm becomes the exchange algori
 The parallel computation is implemented for the $K$ auxiliary draws.
 
 The function `S.G.ABC.MCMC.Strauss.repeat.draws()` implements one round of proposed draw for the SPP in the `repeat` loop (step $1$ of the Algorithm $5$ in the paper) of the ABC-MCMC algorithm proposed by [Shirota and Gelfand (2017)](https://doi.org/10.1080/10618600.2017.1299627) and returns the proposed states as well as the indicator of whether the corresponding $\Psi(\hat{\theta}',\hat{a})$ is smaller than the acceptance threshold $\epsilon$.
-The function `S.G.Parallel.ABC.MCMC.Strauss()` apply the implementation of the ABC-MCMC algorithm for SPP with the approximate parallel computation discussed in section $4$ of the paper.
+The function `S.G.Parallel.ABC.MCMC.Strauss()` apply the implementation of the ABC-MCMC algorithm for SPP with the approximate parallel computation discussed in Section $4$ of the paper.
 
 We start from the process of generating the artificial data used in the SPP simulation study where we set $\beta = 200, \gamma = 0.1$ and $R = 0.05$ on $S = [0,1]\times[0,1]$.
 
@@ -224,7 +224,7 @@ The summarizing processes are similar to the ground truth case shown above and w
 
 ### The SS1 Implementation of the ABC-MCMC Algorithm
 
-As we discussed in section $4$ of the paper, the ABC-MCMC algorithm we make the comparisons with requires a pilot run to approximate the linear coefficients of the linear regression and to decide the acceptance thresholds.
+As we discussed in Section $4$ of the paper, the ABC-MCMC algorithm we make the comparisons with requires a pilot run to approximate the linear coefficients of the linear regression and to decide the acceptance thresholds.
 We start from setting the $K$-function for the observation $\boldsymbol{y}$ with respect to $\hat{R}$, and setting the number of iterations in the pilot run.
 
 ``` r
@@ -236,7 +236,7 @@ SS1_SPP_Pilot.L <- 10000
 ```
 
 Then we define a function to implement the pilot run with parallel computation.
-Here the settings follow what we introduced in the simulation study section $6.1$ of the paper, that is, $\pi(\beta)=\text{U}(50, 400), \pi(\gamma)=\text{U}(0,1)$ and $R=\hat{R}$ we obtained by the profile pseudo-likelihood method illustrated above.
+Here the settings follow what we introduced in the simulation study Section $6.1$ of the paper, that is, $\pi(\beta)=\text{U}(50, 400), \pi(\gamma)=\text{U}(0,1)$ and $R=\hat{R}$ we obtained by the profile pseudo-likelihood method illustrated above.
 
 ``` r
 # ABC-MCMC Pilot Draws Function
@@ -304,7 +304,7 @@ SS1_SPP_Pilot.psi <- ((SS1_SPP_Pilot.eta%*%SS1_SPP_Pilot.lmCoefBeta[2:3])^2)/SS1
 
 We specify three different percentiles for the acceptance thresholds $\epsilon$ in this simulation study.
 In this GitHub code page, let's denote $p$ as the $p$ percentile (for example, $p=0.025, 0.01, 0.005$). 
-And we denote $p^\*$ as the $p^\*$ percent percentile (for example, $p^\*=2.5, 1, 0.5$) which is the notation we used in the section $4$ of the paper.
+And we denote $p^\*$ as the $p^\*$ percent percentile (for example, $p^\*=2.5, 1, 0.5$) which is the notation we used in the Section $4$ of the paper.
 Instead of $p^\*$, we propose to mainly use $p$, where $p=0.025, 0.01, 0.005$, in this file.
 
 ``` r
@@ -316,7 +316,7 @@ SS1_SPP_Pilot.0.025eps <- quantile(SS1_SPP_Pilot.psi,probs=0.025)[[1]]
 
 The main ABC-MCMC algorithm is implemented as following.
 We start from the case where the $\epsilon$ is set as $p^\*=2.5$ percent, that is, $p=0.025$, estimated percentile.
-Recall here that the approximate parallel computation as we discussed in the section $4$ of the paper is implemented.
+Recall here that the approximate parallel computation as we discussed in the Section $4$ of the paper is implemented.
 
 ``` r
 ## ABC-MCMC algorithm with approximate parallel computation p0.025
@@ -457,10 +457,10 @@ title(main = "ABC-MCMC p0.5", mgp=c(1,0.25,0),cex.main=1,cex.lab = 0.8)
 par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42),mgp=c(3,1,0))
 ```
 
-## Determinantal Point Process with A Gaussian Kernel Simulation Study $2$
+## Determinantal Point Process with a Gaussian Kernel Simulation Study $2$
 
-We illustrate the code and plots for our second determinantal point Process with a Gaussian Kernel (dppG) in this simulation study 2 (SS2).
-Again we start from the generation of the artificial data from the dppG with the settings applied in the section $6.2$ of the paper, that is, $\tau = 100, \sigma = 0.05$.
+We illustrate in this Section the code and plots for our second determinantal point Process with a Gaussian Kernel (dppG) experiments in the simulation study 2 (SS2).
+Again we start from the generation of the artificial data from the dppG with the settings applied in the Section $6.2$ of the paper, that is, $\tau = 100, \sigma = 0.05$.
 
 ``` r
 ## Generate from dppG
@@ -473,13 +473,13 @@ SS2_dppG_Tau100_Sigma0.05_ObsY <- ppp(SS2_dppG_Tau100_Sigma0.05_ObsY[,1],SS2_dpp
 ```
 
 The `dppG_logDensity()` function in the [`Algorithm_Functions_for_RSPP.R`] evaluates the log density of the $\hat{X}_S$ without the normalising constant.
-The `dppG_MH()` function implements the Metropolis-Hastings algorithm for the dppG due to the tractability of the likelihood normalising term of the $\hat{X}_S$.
-The function `dppG_Noisy_E_kth_Ratio()`, which is similar as that in SPP cases, calculates the unnormalised likelihood ratio $\frac{q(x_k'|\theta^{(t-1)})}{q(x_k'|\theta')}$ for noisy M-H algorithm.
+The `dppG_MH()` function implements the Metropolis-Hastings algorithm for dppG which is available due to the tractability of the likelihood normalising term of the $\hat{X}_S$.
+The function `dppG_Noisy_E_kth_Ratio()`, which is similar as that in SPP cases, calculates the unnormalised likelihood ratio $\frac{q(x_k'|\theta^{(t-1)})}{q(x_k'|\theta')}$ for the $k$ th auxiliary draw of the noisy M-H algorithm.
 The function `dppG_Parallel_Noisy_MH()` implements the exchange or the noisy M-H algorithm for dppG with parallel computation.
 
 Recall here that we propose to apply an approximation of the unnormalised likelihood function for $\hat{X}_S$ in order to improve the efficiency.
-The functions `Approx_dppG_Noisy_E_kth_Ratio()` and `Approx_dppG_Parallel_Noisy_MH()` corresponds to the approximate exchange and noisy M-H algorithms.
-The ABC-MCMC functions for dppG, `S.G.ABC.MCMC.dppG.repeat.draws()` and `S.G.Parallel.ABC.MCMC.dppG()`, are similar as those of SPP cases and the only difference is that the summary statistic $\boldsymbol{\eta_2}$ is now evaluated at $10$ equally spaced $r_i$'s from $i=1$ to $i=10$ as we discussed in the end of section $5$ of the paper.
+The functions `Approx_dppG_Noisy_E_kth_Ratio()` and `Approx_dppG_Parallel_Noisy_MH()` correspond to the approximate exchange or the approximate noisy M-H algorithm.
+The ABC-MCMC functions for dppG, `S.G.ABC.MCMC.dppG.repeat.draws()` and `S.G.Parallel.ABC.MCMC.dppG()`, are similar as those of SPP cases and the only difference is that the summary statistic $\boldsymbol{\eta_2}$ is now evaluated at $10$ equally spaced $r_i$'s from $i=1$ to $i=10$ as we discussed in the end of Section $5$ of the paper.
 
 The ground truth in this dppG simulation study is to implement the M-H algorithm for $120,000$ iterations with $20,000$ burn-in.
 The initial states are set as $\tau_0=125,\sigma_0=0.04$ and the proposal epsilons are tuned to be $\epsilon_{\tau}=32, \epsilon_{\sigma}=0.015$.
@@ -513,14 +513,11 @@ SS2_dppG_Tau100_Sigma0.05_MH_T12000_1_time <- time_end-time_start
 ```
 
 Due to the fact that the code for summary statistics are similar as that of the SPP cases, we propose not to show amount of the repeated code of the summary statistics for all the following implementations.
-The implementation code for the exchange, noisy M-H, approximate exchange, approximate noisy M-H algorithms are also similar as those of SPP cases as shown below.
+The implementation code for the exchange, noisy M-H, approximate exchange, approximate noisy M-H algorithms are also similar to those of the SPP cases as shown below.
 
 ### The SS2 Implementations of the Exchange and Noisy M-H Algorithms
 
 ``` r
-#--------------------------------------------------------------------------------------------------------------------------------------------
-#--------------------------------------------------------------------------------------------------------------------------------------------
-
 # Exchange algorithm == Noisy MH K1 algorithm for dppG
 cl <- parallel::makeCluster(detectCores()[1]-1)
 clusterExport(cl=cl, list("simulate", "dppGauss","Kest","dppG_logDensity","fourierbasisraw","logdet"))
@@ -626,7 +623,7 @@ stopCluster(cl)
 
 The code for the pilot run of the ABC-MCMC algorithm for dppG is shown as below.
 Note here that the pilot sampling of the parameter $\tau$ follows the prior distribution $\pi(\tau)=\text{U}(50, 200)$.
-Though the prior distribution of $\sigma$ is proposed to be $\pi(\sigma)=\text{U}(0.001,1/\sqrt{10\pi})$, the existance of the dppG restricts the parameter $\sigma$ to be bounded by $1/\sqrt{\tau\pi}$.
+Though the prior distribution of $\sigma$ is proposed to be $\pi(\sigma)=\text{U}(0.001,1/\sqrt{50\pi})$, the existance of the dppG restricts the parameter $\sigma$ to be bounded by $1/\sqrt{\tau\pi}$.
 Moreover, the $10$ equally spaced $r_i$'s from $i=1$ to $i=10$ are specified here by the code `r_M <- seq(0.01,0.1,0.01)`.
 
 ``` r
@@ -684,7 +681,7 @@ SS2_dppG_Pilot.0.01eps <- quantile(SS2_dppG_Pilot.psi,probs=0.01)[[1]]
 SS2_dppG_Pilot.0.025eps <- quantile(SS2_dppG_Pilot.psi,probs=0.025)[[1]]
 ```
 
-The main implementation code of the ABC-MCMC algorithm with approximate parallel computation is following for the two cases $p=0.01$ and $p=0.005$.
+The main implementation code of the ABC-MCMC algorithm with the approximate parallel computation is following for the two cases $p=0.01$ and $p=0.005$.
 
 ``` r
 ## ABC-MCMC algorithm for dppG with approximate parallel computation p0.01
@@ -718,7 +715,7 @@ stopCluster(cl)
 # Time difference of 21.44336 hours
 ```
 
-The plot of the point locations of the SS2 aritificial dataset shown as Figure $4$ in section $6.2$ can be recovered by the following code.
+The plot of the point locations of the SS2 aritificial dataset shown as Figure $4$ in Section $6.2$ can be recovered by the following code.
 
 ```r
 par(mfrow=c(1,1),mai = c(0.5, 0.5, 0.5, 0.5),mgp=c(1.25,0.45,0))
@@ -788,7 +785,7 @@ colnames(duke_forest) <- c("x","y")
 ```
 
 The profile pseudo-likelihood method is applied in the similar way as in [Shirota and Gelfand (2017)](https://doi.org/10.1080/10618600.2017.1299627).
-The estimated $\hat{R}=0.053$.
+The estimated interaction radius is $\hat{R}=0.053$.
 
 ```r
 ## profile pseudo-likelihood method, i.e. maximum pseudo-likelihood calculated at r
@@ -799,7 +796,7 @@ plot(RDA_SPP_pplmStrauss$param[,1],RDA_SPP_pplmStrauss$prof,type = "l",xlab = "R
 abline(v=RDA_SPP_pplmStrauss$fit$interaction$par$r,col = 2,lty = 2)
 ```
 
-The plots of the tree positions of the real dataset and the profile pseudo-likelihood shown as Figure $7$ in real data application (RDA) section $7$ of the paper can be recovered by the following code.
+The plots of the tree positions of the real dataset and the profile pseudo-likelihood shown as Figure $7$ in real data application (RDA) Section $7$ of the paper can be recovered by the following code.
 
 ```r
 par(mfrow=c(1,2),mai = c(0.5, 0.5, 0.25, 0.05),mgp=c(1.25,0.45,0))
@@ -819,9 +816,9 @@ In this real data application we apply the same experiments as we implemented in
 In order to make everything clear enough, we modify the functions used in SPP simulation study and obtain the corresponding specific functions for the real data applications.
 The function `df_SPP_Parallel_Noisy_MH()` is the exchange or noisy M-H algorithm implementation of fitting SPP model to the real Duke Forest (df) dataset with parallel computation.
 The function `df.S.G.Parallel.ABC.MCMC.Strauss()` is the ABC-MCMC implementation with approximate parallel computation.
-If we compare with the functions `SPP_Parallel_Noisy_MH()` and `S.G.ABC.MCMC.Strauss.repeat.draws()`, the only difference is the prior and bound proposal settings, that is, $\pi(\beta)=\text{U}(50,350)$ and $\pi(\gamma)=\text{U}(0,1)$.
+If we compare the above functions with the functions `SPP_Parallel_Noisy_MH()` and `S.G.ABC.MCMC.Strauss.repeat.draws()`, the only difference is the prior and bounded proposal settings, that is, $\pi(\beta)=\text{U}(50,350)$ and $\pi(\gamma)=\text{U}(0,1)$.
 
-The ground truth is to implement exchange algorithm for $1,200,000$ iterations with $200,000$-iteration burn-in.
+The ground truth is to implement the exchange algorithm for $1,200,000$ iterations with $200,000$-iteration burn-in.
 The initial states of all the implementations below are set as $\beta_0=190,\gamma_0=0.2$, and the proposal epsilons are tuned to be $\epsilon_{\beta}=50, \epsilon_{\gamma}=0.23$.
 
 ```r
@@ -830,7 +827,7 @@ cl <- parallel::makeCluster(detectCores()[1]-1)
 clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel computation
 time_start <- Sys.time()
 RDA_SPP_NoisyMH_K1_T1200000_1 <-
-  df_Strauss_Parallel_Noisy_MH(Y=duke_forest,beta0=190, gamma0=0.2,eps_beta=50, eps_gamma=0.23, R=RDA_SPP_R_hat, K=1, T=1200000)
+  df_SPP_Parallel_Noisy_MH(Y=duke_forest,beta0=190, gamma0=0.2,eps_beta=50, eps_gamma=0.23, R=RDA_SPP_R_hat, K=1, T=1200000)
 time_end <- Sys.time()
 RDA_SPP_NoisyMH_K1_T1200000_1_time <- time_end-time_start
 # stopCluster(cl)
@@ -1041,7 +1038,7 @@ stopCluster(cl)
 # Time difference of 11.55707 hours
 ```
 
-The box plots Figure $8$ in section $7$ can be recovered by the following code.
+The box plots Figure $8$ in Section $7$ can be recovered by the following code.
 
 ```r
 par(mfrow=c(1,2),mai = c(0.3, 0.3, 0.05, 0.01),mgp=c(0.45,0.3,0))
@@ -1101,7 +1098,7 @@ legend("topright", legend=c("GT","Ex","NMH K2","ABC p0.5"),
 par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42),mgp=c(3,1,0))
 ```
 
-If we construct the Table $3$ shown in section $7$ of the paper in the `R` code, and store it as `RDA_SPP_comparison_table` in the enviroment, the Figure $10$ of the paper can be recovered by the following code.
+If we construct the Table $3$ shown in Section $7$ of the paper in the `R` code, and store it as `RDA_SPP_comparison_table` in the enviroment, the Figure $10$ of the paper can be recovered by the following code.
 
 ```r
 par(mfrow=c(1,2),mai = c(0.25, 0.25, 0.25, 0.05),mgp=c(1.25,0.25,0))
@@ -1125,7 +1122,7 @@ par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42),mgp=c(3,1,0))
 ```
 
 Since the code for constructing the table `RDA_SPP_comparison_table` requires hundreds of lines to summarize the outputs and to integrate all the summary statistics together.
-We propose not to provide more details here in order not to make this page too lengthy.
+We propose not to provide more details here.
 
 
 
