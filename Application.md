@@ -40,7 +40,7 @@ The artificial dataset we applied in the paper can be called directly as follows
 ``` r
 ## Simulation study 1 observation
 SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY <- as.matrix(read.csv("SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY.csv",header=FALSE))
-SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY  <- ppp(SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY[,1],SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY[,2]) # transform to point pattern class
+SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY <- ppp(SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY[,1],SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY[,2]) # transform to point pattern class
 ```
 
 Then we can obtain the estimated interaction radius $R$ by the profile pseudo-likelihood method.
