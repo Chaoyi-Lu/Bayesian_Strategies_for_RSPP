@@ -34,7 +34,7 @@ Z_observation <- rStrauss(beta = 200, gamma = 0.1, R = 0.05, W = square(1))
 # utils::write.table(x=cbind(Z_observation$x,Z_observation$y),file="SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY.csv", sep="," , row.names = FALSE, col.names=FALSE)
 ```
 
-All the point locations are stored in the file [`SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY.csv`].
+All the simulated synthetic point locations are stored in the file [`SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY.csv`].
 The artificial dataset we applied in the paper can be called directly as follows.
 
 ``` r
