@@ -85,7 +85,9 @@ SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K1_T1200000_1_time <- time_end-time_start
 # Time difference of 2.459206 hours # This is the implementation time we show on the paper
 ```
 
-Here we provide a reference of the time taken by the implementation.
+The implementation time is stored in `SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K1_T1200000_1_time`.
+Here we provide a reference of the implementation time we obtain in our experiments.
+Note here that all our experiments are based on a CPU with a 1.80GHz processor and 7 cores.
 The function above returns a list of $\beta$ chain and a list of $\gamma$ chain as well as the corresponding acceptance rate of the algorithm.
 The outputs are stored in `SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K1_T1200000_1` and thus we can apply the summary statistics on those outputs shown below.
 
