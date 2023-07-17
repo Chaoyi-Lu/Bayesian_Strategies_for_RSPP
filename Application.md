@@ -17,7 +17,7 @@ The explanations of the functions in the file [`Algorithm_Functions_for_RSPP.R`]
 
 ## Strauss Point Process Simulation Study $1$
 
-The function `Noisy_E_kth_Ratio()` corresponds to the $k$ th auxiliary draw of the noisy Metropolis-Hastings (noisy M-H) algorithm as well as the corresponding evaluation of the unnormalised likelihood ratio $\frac{q(x_n'|\theta^{(t-1)})}{q(x_n'|\theta')}$. 
+The function `Noisy_E_kth_Ratio()` corresponds to the $k$ th auxiliary draw of the noisy Metropolis-Hastings (noisy M-H) algorithm as well as the corresponding evaluation of the unnormalised likelihood ratio $\frac{q(x_k'|\theta^{(t-1)})}{q(x_k'|\theta')}$. 
 The function `SPP_Parallel_Noisy_MH()` is the noisy M-H algorithm implemented for the Strauss point process (SPP) in this simulation study 1 (SS1).
 The input $K$ is the fixed number of auxiliary draws.
 Note further that, by setting $K=1$, the algorithm becomes the exchange algorithm.
@@ -468,7 +468,7 @@ SS2_dppG_Tau100_Sigma0.05_ObsY <- ppp(SS2_dppG_Tau100_Sigma0.05_ObsY[,1],SS2_dpp
 
 The `dppG_logDensity()` function in the [`Algorithm_Functions_for_RSPP.R`] evaluates the log density of the $\hat{X}_S$ without the normalising constant.
 The `dppG_MH()` function implements the Metropolis-Hastings algorithm for the dppG due to the tractability of the likelihood normalising term of the $\hat{X}_S$.
-The function `dppG_Noisy_E_kth_Ratio()`, which is similar as that in SPP cases, calculates the unnormalised likelihood ratio $\frac{q(x_n'|\theta^{(t-1)})}{q(x_n'|\theta')}$ for noisy M-H algorithm.
+The function `dppG_Noisy_E_kth_Ratio()`, which is similar as that in SPP cases, calculates the unnormalised likelihood ratio $\frac{q(x_k'|\theta^{(t-1)})}{q(x_k'|\theta')}$ for noisy M-H algorithm.
 The function `dppG_Parallel_Noisy_MH()` implements the exchange or the noisy M-H algorithm for dppG with parallel computation.
 
 Recall here that we propose to apply an approximation of the unnormalised likelihood function for $\hat{X}_S$ in order to improve the efficiency.
