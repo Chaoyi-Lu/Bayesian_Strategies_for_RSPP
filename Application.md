@@ -288,7 +288,7 @@ library(glmnet)
 SS1_SPP_Pilot.lmCoef <- coef(cv.glmnet(x=SS1_SPP_Pilot.eta,y=log(cbind(SS1_SPP_Pilot.beta,SS1_SPP_Pilot.gamma)),family="mgaussian",alpha=1),s="lambda.min")
 ```
 
-Then we can extract the linear coefficients and calculate the sample variance of each estimated model parameter as well as the distance measures $\{ \Psi(\boldsymbol{\hat{\theta}}\_l, \boldsymbol{\hat{a}}) \}^{L}_{l = 1}$ for each iteration of the pilot run. 
+Then we can extract the linear coefficients and calculate the sample variance of each estimated model parameter as well as the distance measures $\\{ \Psi(\boldsymbol{\hat{\theta}}\_l, \boldsymbol{\hat{a}}) \\}^{L}_{l = 1}$ for each iteration of the pilot run. 
 
 ``` r
 # Linear coefficients for each model parameter 
