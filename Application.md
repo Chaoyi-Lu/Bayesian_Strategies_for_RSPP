@@ -69,6 +69,7 @@ par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42),mgp=c(3,1,0))
 
 The ground truth implementation is to apply the exchange algorithm for $1,200,000$ iterations as follows.
 The initial states are set as $\beta_0=190,\gamma_0=0.2$ and the proposal epsilons are tuned to be $\epsilon_{\beta}=65, \epsilon_{\gamma}=0.16$.
+The interaction radius $R$ is set as the estimation $R=\hat{R}=0.0508$.
 
 ``` r
 # Exchange Ground Truth
