@@ -134,7 +134,7 @@ SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K1_T120000_1_time <- time_end-time_start
 # stopCluster(cl)
 # # Time difference of 16.09556 mins
 
-# # Noisy Exchange K2
+# # Noisy M-H K2
 # cl <- parallel::makeCluster(detectCores()[1]-1)
 # clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel computation
 time_start <- Sys.time()
@@ -146,7 +146,7 @@ SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K2_T120000_1_time <- time_end-time_start
 # stopCluster(cl)
 # # Time difference of 20.47789 mins
 
-# # Noisy Exchange K3
+# # Noisy M-H K3
 # cl <- parallel::makeCluster(detectCores()[1]-1)
 # clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel computation
 time_start <- Sys.time()
@@ -158,7 +158,7 @@ SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K3_T120000_1_time <- time_end-time_start
 # stopCluster(cl)
 # # Time difference of 26.43284 mins
 
-# # Noisy Exchange K4
+# # Noisy M-H K4
 # cl <- parallel::makeCluster(detectCores()[1]-1)
 # clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel computation
 time_start <- Sys.time()
@@ -170,7 +170,7 @@ SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K4_T120000_1_time <- time_end-time_start
 # stopCluster(cl)
 # # Time difference of 29.71931 mins
 
-# # Noisy Exchange K5
+# # Noisy M-H K5
 # cl <- parallel::makeCluster(detectCores()[1]-1)
 # clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel computation
 time_start <- Sys.time()
@@ -182,7 +182,7 @@ SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K5_T120000_1_time <- time_end-time_start
 # stopCluster(cl)
 # # Time difference of 33.15239 mins
 
-# # Noisy Exchange K6
+# # Noisy M-H K6
 # cl <- parallel::makeCluster(detectCores()[1]-1)
 # clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel computation
 time_start <- Sys.time()
@@ -194,7 +194,7 @@ SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K6_T120000_1_time <- time_end-time_start
 # stopCluster(cl)
 # # Time difference of 35.10859 mins
 
-# # Noisy Exchange K7
+# # Noisy M-H K7
 # cl <- parallel::makeCluster(detectCores()[1]-1)
 # clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel computation
 time_start <- Sys.time()
@@ -206,7 +206,7 @@ SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K7_T120000_1_time <- time_end-time_start
 # stopCluster(cl)
 # # Time difference of 41.63192 mins
 
-# # Noisy Exchange K8
+# # Noisy M-H K8
 # cl <- parallel::makeCluster(detectCores()[1]-1)
 # clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel computation
 time_start <- Sys.time()
