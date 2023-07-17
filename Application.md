@@ -315,7 +315,7 @@ SS1_SPP_Pilot.0.025eps <- quantile(SS1_SPP_Pilot.psi,probs=0.025)[[1]]
 ```
 
 The main ABC-MCMC algorithm is implemented as following.
-We start from the case where the $\epsilon$ is set as $2.5$ percent estimated percentile.
+We start from the case where the $\epsilon$ is set as $p^\*=2.5$ percent, that is, $p=0.025$, estimated percentile.
 Recall here that the approximate parallel computation as we discussed in the section $4$ of the paper is implemented.
 
 ``` r
