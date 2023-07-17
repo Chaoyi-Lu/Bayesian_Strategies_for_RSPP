@@ -235,7 +235,7 @@ SS1_SPP_Kfunc_Obs_R_hat <- SS1_SPP_Kfunc_Obs(SS1_SPP_R_hat)
 SS1_SPP_Pilot.L <- 10000
 ```
 
-Then we define a function to apply the pilot run and implement with parallel computation for it.
+Then we define a function to implement the pilot run with parallel computation.
 Here the settings follow what we introduced in the simulation study section $6.1$ of the paper, that is, $\pi(\beta)=\text{U}(50, 400), \pi(\gamma)=\text{U}(0,1)$ and $R=\hat{R}$ we obtained by the profile pseudo-likelihood method illustrated above.
 
 ``` r
@@ -261,7 +261,7 @@ stopCluster(cl)
 ```
 
 The corresponding reference implementation time of the pilot run is also provided.
-However, it can be neglected if we compare to the time taken by the main algorithm of the ABC-MCMC algorithm and thus it was not counted in the comparisons.
+However, it can be neglected if we compare to the time taken by the main algorithm of the ABC-MCMC algorithm (shown in the following context or, for example, in the Table $1$ of the paper) and thus it was not counted in the comparisons.
 Due to the fact that the parallel computation code returns a list each element of which further contains a list of outputs from each iteration of the pilot run.
 We need to extract each single chain of the parameter by the following code.
 
