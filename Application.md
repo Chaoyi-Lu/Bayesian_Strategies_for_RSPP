@@ -96,8 +96,8 @@ The outputs are stored in `SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K1_T1200000_1`
 # Acceptance rate
 SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K1_T1200000_1$AcceptanceRate
 # Posterior trace plot
-plot(SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K1_T1200000_1$beta, type = "l")
-plot(SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K1_T1200000_1$gamma, type = "l")
+plot(SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K1_T1200000_1$beta[200001:1200001], type = "l")
+plot(SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K1_T1200000_1$gamma[200001:1200001], type = "l")
 # Posterior density plot
 plot(density(SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K1_T1200000_1$beta[200001:1200001]))
 plot(density(SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K1_T1200000_1$gamma[200001:1200001]))
@@ -337,7 +337,7 @@ stopCluster(cl)
 
 Similar as the exchange and noisy M-H algorithms experiments, we can obtain the summarized statistics of the outputs as follows.
 Note here that we further monitor the number of draws in the `repeat` loop until the acceptance condition is satisfied.
-And we also monitor whether there are more than one draws which satisfy the the acceptance condition within one round of $J$ parallel draws.
+And we also monitor whether there are more than one draws which satisfy the acceptance condition within one round of $J$ parallel draws.
 
 ``` r
 # # Example summary statistics
@@ -367,7 +367,7 @@ mean(SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.025_T120000_1$NumOfAcceptedDrawsI
 table(SS1_SPP_Beta200_Gamma0.1_R0.05_ABCMCMC_p0.025_T120000_1$NumOfAcceptedDrawsInEachNumCoresDraws[20001:120001])
 ```
 
-Similar implementation and summary statistics can also be applied for the case where $p=0.01$ and $p=0.005$.
+Similar implementations and summary statistics can also be applied for the cases where $p=0.01$ and $p=0.005$.
 
 ``` r
 ## ABC-MCMC algorithm with approximate parallel computation p0.01
