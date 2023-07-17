@@ -118,7 +118,7 @@ Note here that the first element of the chain is the initial state $\theta^{(0)}
 
 ### The SS1 Implementation of the Exchange and Noisy M-H Algorithms
 
-Similar implementations are applied for the algorithm comparisons of the exchange and noisy M-H algorithms implemented for $120000$ iterations.
+Similar implementations are applied for the algorithm comparisons of the exchange and noisy M-H algorithms implemented for $120,000$ iterations.
 The noisy M-H function `SPP_Parallel_Noisy_MH()` is implemented from $K=1$ to $K=8$ where the $K=1$ case is equivalent to the exchange algorithm.
 
 ``` r
