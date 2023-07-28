@@ -15,7 +15,7 @@ library(latex2exp) # For mathematics symbol in the plot
 
 The explanations of the functions in the file [`Algorithm_Functions_for_RSPP.R`] are provided in the corresponding comments in the file.
 
-## Strauss Point Process Simulation Study $1$
+## 1. Strauss Point Process Simulation Study $1$
 
 The function `Noisy_E_kth_Ratio()` corresponds to the $k$ th auxiliary draw of the noisy Metropolis-Hastings (noisy M-H) algorithm as well as the corresponding evaluation of the unnormalised likelihood ratio $\frac{q(x_k'|\theta^{(t-1)})}{q(x_k'|\theta')}$. 
 The function `SPP_Parallel_Noisy_MH()` is the noisy M-H algorithm implemented for the Strauss point process (SPP) in this simulation study 1 (SS1).
@@ -116,7 +116,7 @@ sd(SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K1_T1200000_1$gamma[200001:1200001])
 
 Note here that the first element of the chain is the initial state $\theta^{(0)}$ and thus we need to drop the first $200,001$ iterations in order for the $200,000$ burn-in.
 
-### The SS1 Implementation of the Exchange and Noisy M-H Algorithms
+### 1.1 The SS1 Implementation of the Exchange and Noisy M-H Algorithms
 
 Similar implementations are applied for the algorithm comparisons of the exchange and noisy M-H algorithms implemented for $120,000$ iterations.
 The noisy M-H function `SPP_Parallel_Noisy_MH()` is implemented from $K=1$ to $K=8$ where the $K=1$ case is equivalent to the exchange algorithm.
@@ -222,7 +222,7 @@ stopCluster(cl)
 The corresponding reference implementation time is also provided above for each case.
 The summarizing processes are similar to the ground truth case shown above and we propose not to put them here in order not to make this file become too lengthy.
 
-### The SS1 Implementation of the ABC-MCMC Algorithm
+### 1.2 The SS1 Implementation of the ABC-MCMC Algorithm
 
 As we discussed in Section $4$ of the paper, the ABC-MCMC algorithm we make the comparisons with requires a pilot run to approximate the linear coefficients of the linear regression and to decide the acceptance thresholds.
 We start from setting the $K$-function for the observation $\boldsymbol{y}$ with respect to $\hat{R}$, and setting the number of iterations in the pilot run.
@@ -457,7 +457,7 @@ title(main = "ABC-MCMC p0.5", mgp=c(1,0.25,0),cex.main=1,cex.lab = 0.8)
 par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42),mgp=c(3,1,0))
 ```
 
-## Determinantal Point Process with a Gaussian Kernel Simulation Study $2$
+## 2. Determinantal Point Process with a Gaussian Kernel Simulation Study $2$
 
 We illustrate in this Section the code and plots for our second determinantal point Process with a Gaussian Kernel (dppG) experiments in the simulation study 2 (SS2).
 Again we start from the generation of the artificial data from the dppG with the settings applied in the Section $6.2$ of the paper, that is, $\tau = 100, \sigma = 0.05$.
@@ -472,7 +472,9 @@ SS2_dppG_Tau100_Sigma0.05_ObsY <- as.matrix(read.csv("SS2_dppG_Tau100_Sigma0.05_
 SS2_dppG_Tau100_Sigma0.05_ObsY <- ppp(SS2_dppG_Tau100_Sigma0.05_ObsY[,1],SS2_dppG_Tau100_Sigma0.05_ObsY[,2]) # transform to point pattern
 ```
 
-The `dppG_logDensity()` function in the [`Algorithm_Functions_for_RSPP.R`] evaluates the log density of the $\hat{X}_S$ without the normalising constant.
+The `dppG_logDensity()` function in the [`Algorithm_Functions_for_RSPP.R`] evaluates the log density of the $\hat{X}_S$ without the normalising constant shown in equation $6$ of the paper.
+Within such a function, several inbuilt functions from the package `spatstat` are applied for the evaluation.
+The inbuilt function `fourierbasisraw()` evaluates the Fourier basis functions, and the inbuilt function `dppeigen()` returns the set of $\boldsymbol{k}$'s as well as the spectral density evaluated at those $\boldsymbol{k}$'s which are required for the evaluation of the log density.
 The `dppG_MH()` function implements the Metropolis-Hastings algorithm for dppG which is available due to the tractability of the likelihood normalising term of the $\hat{X}_S$.
 The function `dppG_Noisy_E_kth_Ratio()`, which is similar as that in SPP cases, calculates the unnormalised likelihood ratio $\frac{q(x_k'|\theta^{(t-1)})}{q(x_k'|\theta')}$ for the $k$ th auxiliary draw of the noisy M-H algorithm.
 The function `dppG_Parallel_Noisy_MH()` implements the exchange or the noisy M-H algorithm for dppG with parallel computation.
@@ -497,7 +499,7 @@ SS2_dppG_Tau100_Sigma0.05_MH_T120000_1_time <- time_end-time_start
 
 It can be seen that the implementation time is much longer than the SPP cases even though the number of iterations is much less than that of the SS1.
 
-### The SS2 Implementation of the M-H Algorithm
+### 2.1 The SS2 Implementation of the M-H Algorithm
 
 Similarly the M-H algorithm can also be implemented for $12,000$ iterations with $2000$ iteration burn-in for the algorithm comparisons.
 
@@ -515,7 +517,7 @@ SS2_dppG_Tau100_Sigma0.05_MH_T12000_1_time <- time_end-time_start
 Due to the fact that the code for summary statistics are similar as that of the SPP cases, we propose not to show amount of the repeated code of the summary statistics for all the following implementations.
 The implementation code for the exchange, noisy M-H, approximate exchange, approximate noisy M-H algorithms are also similar to those of the SPP cases as shown below.
 
-### The SS2 Implementations of the Exchange and Noisy M-H Algorithms
+### 2.2 The SS2 Implementations of the Exchange and Noisy M-H Algorithms
 
 ``` r
 # Exchange algorithm == Noisy MH K1 algorithm for dppG
@@ -543,7 +545,7 @@ stopCluster(cl)
 # Time difference of 12.95519 hours
 ```
 
-### The SS2 Implementations of the Approximate Exchange and the Approximate Noisy M-H Algorithms
+### 2.3 The SS2 Implementations of the Approximate Exchange and the Approximate Noisy M-H Algorithms
 
 ``` r
 # Approximate exchange == Noisy MH K1 algorithm for dppG
@@ -619,7 +621,7 @@ stopCluster(cl)
 # Time difference of 3.971992 hours
 ```
 
-### The SS2 Implementation of the ABC-MCMC Algorithm
+### 2.4 The SS2 Implementation of the ABC-MCMC Algorithm
 
 The code for the pilot run of the ABC-MCMC algorithm for dppG is shown as below.
 Note here that the pilot sampling of the parameter $\tau$ follows the prior distribution $\pi(\tau)=\text{U}(50, 200)$.
@@ -772,7 +774,7 @@ legend("topleft", legend=c("GT","MH","Ex","NMH K2",TeX(r'(Ex$^{app}$)'),TeX(r'(N
 par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42),mgp=c(3,1,0))
 ```
 
-## Real Data Application
+## 3. Real Data Application
 
 Recall here that we apply the algorithm comparisons by fitting the Strauss point process model to the Duke Forest dataset processed by [Shirota and Gelfand (2017)](https://doi.org/10.1080/10618600.2017.1299627).
 The dataset can be found in the link above as well as the `RealF_Data.csv` provided with this GitHub page.
@@ -834,7 +836,7 @@ RDA_SPP_NoisyMH_K1_T1200000_1_time <- time_end-time_start
 # # Time difference of 1.411561 hours
 ```
 
-### The RDA Implementations of the Exchange and Noisy M-H Algorithms
+### 3.1 The RDA Implementations of the Exchange and Noisy M-H Algorithms
 
 The implementations of the algorithm comparisons for the exchange and noisy M-H algorithms are shown below by implementing the function `df_SPP_Parallel_Noisy_MH()` for $120,000$ iterations from $K=1$ to $K=8$.
 
@@ -928,7 +930,7 @@ stopCluster(cl)
 # Time difference of 39.15605 mins
 ```
 
-### The RDA Implementation of the ABC-MCMC Algorithm
+### 3.2 The RDA Implementation of the ABC-MCMC Algorithm
 
 The pilot run for the real data applications is shown below.
 The process is exactly the same as SS1 pilot run except the prior settings.
