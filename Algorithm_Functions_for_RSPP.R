@@ -134,23 +134,11 @@ S.G.Parallel.ABC.MCMC.Strauss <- function(Y, beta0, gamma0, eps_beta, eps_gamma,
     # it's possible that two or more acceptances happen within one round of NumCores draws 
     # so we pick the first one as the proposed state
     theta_p <- Flag_psi_and_theta_p[2:3,which.max(Flag_psi_and_theta_p[1,])] 
-    beta_p <- theta_p[1]
-    gamma_p <- theta_p[2]
+    beta_list[t+1] <- theta_p[1]
+    gamma_list[t+1] <- theta_p[2]
     NumOfAcceptedDrawsInEachNumCoresDraws[t+1] <- sum(Flag_psi_and_theta_p[1,])
-    
-    # Determine alpha ratio which is the ratio of proposals because priors are uniform distributions
-    log_alpha_right <- log(beta_p_ub-beta_p_lb) + log(gamma_p_ub-gamma_p_lb) - 
-      log(min(400,beta_p+eps_beta)-max(50,beta_p-eps_beta)) - log(min(1,gamma_p+eps_gamma)-max(0,gamma_p-eps_gamma))
-    if (log(runif(1)) <= min(0, log_alpha_right)){
-      acceptance <- acceptance + 1
-      beta_list[t+1] <- beta_p # update theta list
-      gamma_list[t+1] <- gamma_p
-    }else{
-      beta_list[t+1] <- beta_list[t] # update theta list
-      gamma_list[t+1] <- gamma_list[t]
-    }
   }
-  return(list(beta = beta_list, gamma = gamma_list, AcceptanceRate = acceptance/T, 
+  return(list(beta = beta_list, gamma = gamma_list,
               NumOfDrawsUntilAcceptance = NumOfDrawsUntilAcceptance,NumOfAcceptedDrawsInEachNumCoresDraws = NumOfAcceptedDrawsInEachNumCoresDraws))
 }
 
@@ -422,24 +410,11 @@ S.G.Parallel.ABC.MCMC.dppG <- function(Y, tau0, sigma0, eps_tau, eps_sigma, lmCo
     # it's possible that two or more acceptances happen within one round of NumCores draws 
     # so we pick the first one as the proposed state
     theta_p <- Flag_psi_and_theta_p[2:3,which.max(Flag_psi_and_theta_p[1,])] 
-    tau_p <- theta_p[1]
-    sigma_p <- theta_p[2]
+    tau_list[t+1] <- theta_p[1]
+    sigma_list[t+1] <- theta_p[2]
     NumOfAcceptedDrawsInEachNumCoresDraws[t+1] <- sum(Flag_psi_and_theta_p[1,])
-    sigma_p_ub <- min(1/sqrt(pi*tau_p),sigma_list[t]+eps_sigma) # sigma proposal upper bound
-    
-    # Determine alpha ratio which is the ratio of proposal because priors are uniform distributions
-    log_alpha_right <- log(tau_p_ub-tau_p_lb) + log(sigma_p_ub-sigma_p_lb) - 
-      log(min(200,tau_p+eps_tau)-max(50,tau_p-eps_tau)) - log(min(1/sqrt(pi*tau_list[t]),sigma_p+eps_sigma)-max(0.001,sigma_p-eps_sigma))
-    if (log(runif(1)) <= min(0, log_alpha_right)){
-      acceptance <- acceptance + 1
-      tau_list[t+1] <- tau_p # update theta list
-      sigma_list[t+1] <- sigma_p
-    }else{
-      tau_list[t+1] <- tau_list[t] # update theta list
-      sigma_list[t+1] <- sigma_list[t]
-    }
   }
-  return(list(tau = tau_list, sigma = sigma_list, AcceptanceRate = acceptance/T, 
+  return(list(tau = tau_list, sigma = sigma_list,
               NumOfDrawsUntilAcceptance = NumOfDrawsUntilAcceptance,NumOfAcceptedDrawsInEachNumCoresDraws = NumOfAcceptedDrawsInEachNumCoresDraws))
 }
 
@@ -582,22 +557,10 @@ df.S.G.Parallel.ABC.MCMC.Strauss <- function(Y, beta0, gamma0, eps_beta, eps_gam
     # it's possible that two or more acceptances happen within one round of NumCores draws 
     # so we pick the first one as the proposed state
     theta_p <- Flag_psi_and_theta_p[2:3,which.max(Flag_psi_and_theta_p[1,])] 
-    beta_p <- theta_p[1]
-    gamma_p <- theta_p[2]
+    beta_list[t+1] <- theta_p[1]
+    gamma_list[t+1] <- theta_p[2]
     NumOfAcceptedDrawsInEachNumCoresDraws[t+1] <- sum(Flag_psi_and_theta_p[1,])
-    
-    # Determine alpha ratio which is the ratio of proposal because priors are uniform distributions
-    log_alpha_right <- log(beta_p_ub-beta_p_lb) + log(gamma_p_ub-gamma_p_lb) - 
-      log(min(350,beta_p+eps_beta)-max(50,beta_p-eps_beta)) - log(min(1,gamma_p+eps_gamma)-max(0,gamma_p-eps_gamma))
-    if (log(runif(1)) <= min(0, log_alpha_right)){
-      acceptance <- acceptance + 1
-      beta_list[t+1] <- beta_p # update theta list
-      gamma_list[t+1] <- gamma_p
-    }else{
-      beta_list[t+1] <- beta_list[t] # update theta list
-      gamma_list[t+1] <- gamma_list[t]
-    }
   }
-  return(list(beta = beta_list, gamma = gamma_list, AcceptanceRate = acceptance/T, 
+  return(list(beta = beta_list, gamma = gamma_list,
               NumOfDrawsUntilAcceptance = NumOfDrawsUntilAcceptance,NumOfAcceptedDrawsInEachNumCoresDraws = NumOfAcceptedDrawsInEachNumCoresDraws))
 }
