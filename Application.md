@@ -681,7 +681,7 @@ SS2_dppG_Tau100_Sigma0.05_FPABCMCMC_p0.005_T12000_1_time <- time_end-time_start
 # Time difference of 2.631271 hours
 ```
 
-The plot of the point locations of the SS2 aritificial dataset shown as Figure $4$ in Section $6.2$ can be recovered by the following code.
+The plot of the point locations of the SS2 aritificial dataset shown as Figure $3$ in Section $6.2$ can be recovered by the following code.
 
 ```r
 par(mfrow=c(1,1),mai = c(0.5, 0.5, 0.5, 0.5),mgp=c(1.25,0.45,0))
@@ -690,7 +690,7 @@ title(main = "", mgp=c(1,0.25,0),cex.main=1,cex.lab = 0.8)
 par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42),mgp=c(3,1,0))
 ```
 
-The trace plots of the output for the algorithms shown as Figure $5$ can be recovered by:
+The trace plots of the output for the algorithms shown as Figure $4$ can be recovered by:
 
 ```r
 par(mfrow=c(2,6),mai = c(0.15, 0.15, 0.15, 0.01),mgp=c(0.75,0.25,0))
@@ -710,7 +710,7 @@ plot(SS2_dppG_Tau100_Sigma0.05_FPABCMCMC_p0.01_T12000_1$sigma[2001:12001], type 
 par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42),mgp=c(3,1,0))
 ```
 
-The posterior density plot Figure $6$ can be recovered by:
+The posterior density plot Figure $5$ can be recovered by:
 
 ```r
 par(mfrow=c(1,2),mai = c(0.25, 0.25, 0.25, 0.05),mgp=c(1.25,0.25,0))
@@ -762,7 +762,7 @@ plot(RDA_SPP_pplmStrauss$param[,1],RDA_SPP_pplmStrauss$prof,type = "l",xlab = "R
 abline(v=RDA_SPP_pplmStrauss$fit$interaction$par$r,col = 2,lty = 2)
 ```
 
-The plots of the tree positions of the real dataset and the profile pseudo-likelihood shown as Figure $7$ in real data application (RDA) Section $7$ of the paper can be recovered by the following code.
+The plots of the tree positions of the real dataset and the profile pseudo-likelihood shown as Figure $6$ in real data application (RDA) Section $7$ of the paper can be recovered by the following code.
 
 ```r
 par(mfrow=c(1,2),mai = c(0.5, 0.5, 0.25, 0.05),mgp=c(1.25,0.45,0))
@@ -780,9 +780,9 @@ par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42),mgp=c(3,1,0))
 
 In this real data application we apply the same experiments as we implemented in the SPP simulation study.
 In order to make everything clear enough, we modify the functions used in SPP simulation study and obtain the corresponding specific functions for the real data applications.
-The function `df_SPP_Parallel_Noisy_MH()` is the exchange or noisy M-H algorithm implementation of fitting SPP model to the real Duke Forest (df) dataset with parallel computation.
-The function `df.S.G.Parallel.ABC.MCMC.Strauss()` is the ABC-MCMC implementation with approximate parallel computation.
-If we compare the above functions with the functions `SPP_Parallel_Noisy_MH()` and `S.G.ABC.MCMC.Strauss.repeat.draws()`, the only difference is the prior and bounded proposal settings, that is, $\pi(\beta)=\text{U}(50,350)$ and $\pi(\gamma)=\text{U}(0,1)$.
+The function `df_SPP_Parallel_Noisy_MH()` is for the exchange or noisy M-H algorithm implementation of fitting SPP model to the real Duke Forest (df) dataset with parallel computation.
+The function `df.F.P.ABC.MCMC.Strauss()` is for the ABC-MCMC implementation.
+If we compare the above functions with the functions `SPP_Parallel_Noisy_MH()` and `F.P.ABC.MCMC.Strauss()`, the only difference is the prior and bounded proposal settings, that is, $\pi(\beta)=\text{U}(50,350)$ and $\pi(\gamma)=\text{U}(0,1)$.
 
 The ground truth is to implement the exchange algorithm for $1,200,000$ iterations with $200,000$-iteration burn-in.
 The initial states of all the implementations below are set as $\beta_0=190,\gamma_0=0.2$, and the proposal epsilons are tuned to be $\epsilon_{\beta}=50, \epsilon_{\gamma}=0.23$.
@@ -958,51 +958,65 @@ RDA_SPP_Pilot.0.025eps <- quantile(RDA_SPP_Pilot.psi,probs=0.025)[[1]]
 The implementations of the main ABC-MCMC algorithm for all the three different $p$ cases are following.
 
 ```r
-## ABC-MCMC algorithm with approximate parallel computation p0.025
-NumCores <- detectCores()[1]-1
-cl <- parallel::makeCluster(NumCores)
-clusterExport(cl=cl, list("rStrauss", "square", "Kest")) # In order to use this function for parallel computation
+## Fearnhead & Prangle ABC-MCMC main algorithm p0.025
 time_start <- Sys.time()
-RDA_SPP_ABCMCMC_p0.025_T120000_1 <-
-  df.S.G.Parallel.ABC.MCMC.Strauss(Y = ppp(duke_forest$x,duke_forest$y), beta0=190, gamma0=0.2,eps_beta=50, eps_gamma=0.23,
-                                   lmCoefBeta = RDA_SPP_Pilot.lmCoefBeta, lmCoefGamma = RDA_SPP_Pilot.lmCoefGamma,
-                                   Pilot.VarBeta = RDA_SPP_Pilot.VarBeta, Pilot.VarGamma = RDA_SPP_Pilot.VarGamma,
-                                   eps = RDA_SPP_Pilot.0.025eps, R=RDA_SPP_R_hat, T=120000)
+RDA_SPP_FPABCMCMC_p0.025_T120000_1 <-
+  df.F.P.ABC.MCMC.Strauss(Y = ppp(duke_forest$x,duke_forest$y), beta0=190, gamma0=0.2,eps_beta=50, eps_gamma=0.23,
+                                       lmCoefBeta = RDA_SPP_Pilot.lmCoefBeta, lmCoefGamma = RDA_SPP_Pilot.lmCoefGamma,
+                                       Pilot.VarBeta = RDA_SPP_Pilot.VarBeta, Pilot.VarGamma = RDA_SPP_Pilot.VarGamma,
+                                       eps = RDA_SPP_Pilot.0.025eps, R=RDA_SPP_R_hat, T=120000)
 time_end <- Sys.time()
-RDA_SPP_ABCMCMC_p0.025_T120000_1_time <- time_end-time_start
-stopCluster(cl)
-# Time difference of 2.967832 hours
+RDA_SPP_FPABCMCMC_p0.025_T120000_1_time <- time_end-time_start
+# Time difference of 33.42177 mins
 
-## ABC-MCMC algorithm with approximate parallel computation p0.01
-NumCores <- detectCores()[1]-1
-cl <- parallel::makeCluster(NumCores)
-clusterExport(cl=cl, list("rStrauss", "square", "Kest")) # In order to use this function for parallel computation
+## Fearnhead & Prangle ABC-MCMC main algorithm p0.01
 time_start <- Sys.time()
-RDA_SPP_ABCMCMC_p0.01_T120000_1 <-
-  df.S.G.Parallel.ABC.MCMC.Strauss(Y = ppp(duke_forest$x,duke_forest$y), beta0=190, gamma0=0.2,eps_beta=50, eps_gamma=0.23,
-                                   lmCoefBeta = RDA_SPP_Pilot.lmCoefBeta, lmCoefGamma = RDA_SPP_Pilot.lmCoefGamma,
-                                   Pilot.VarBeta = RDA_SPP_Pilot.VarBeta, Pilot.VarGamma = RDA_SPP_Pilot.VarGamma,
-                                   eps = RDA_SPP_Pilot.0.01eps, R=RDA_SPP_R_hat, T=120000)
+RDA_SPP_FPABCMCMC_p0.01_T120000_1 <-
+  df.F.P.ABC.MCMC.Strauss(Y = ppp(duke_forest$x,duke_forest$y), beta0=190, gamma0=0.2,eps_beta=50, eps_gamma=0.23,
+                                       lmCoefBeta = RDA_SPP_Pilot.lmCoefBeta, lmCoefGamma = RDA_SPP_Pilot.lmCoefGamma,
+                                       Pilot.VarBeta = RDA_SPP_Pilot.VarBeta, Pilot.VarGamma = RDA_SPP_Pilot.VarGamma,
+                                       eps = RDA_SPP_Pilot.0.01eps, R=RDA_SPP_R_hat, T=120000)
 time_end <- Sys.time()
-RDA_SPP_ABCMCMC_p0.01_T120000_1_time <- time_end-time_start
-stopCluster(cl)
-# Time difference of 6.25194 hours
+RDA_SPP_FPABCMCMC_p0.01_T120000_1_time <- time_end-time_start
+# Time difference of 30.77468 mins
 
-## ABC-MCMC algorithm with approximate parallel computation p0.005
-NumCores <- detectCores()[1]-1
-cl <- parallel::makeCluster(NumCores)
-clusterExport(cl=cl, list("rStrauss", "square", "Kest")) # In order to use this function for parallel computation
+## Fearnhead & Prangle ABC-MCMC main algorithm p0.005
 time_start <- Sys.time()
-RDA_SPP_ABCMCMC_p0.005_T120000_1 <-
-  df.S.G.Parallel.ABC.MCMC.Strauss(Y = ppp(duke_forest$x,duke_forest$y), beta0=190, gamma0=0.2,eps_beta=50, eps_gamma=0.23,
-                                   lmCoefBeta = RDA_SPP_Pilot.lmCoefBeta, lmCoefGamma = RDA_SPP_Pilot.lmCoefGamma,
-                                   Pilot.VarBeta = RDA_SPP_Pilot.VarBeta, Pilot.VarGamma = RDA_SPP_Pilot.VarGamma,
-                                   eps = RDA_SPP_Pilot.0.005eps, R=RDA_SPP_R_hat, T=120000)
+RDA_SPP_FPABCMCMC_p0.005_T120000_1 <-
+  df.F.P.ABC.MCMC.Strauss(Y = ppp(duke_forest$x,duke_forest$y), beta0=190, gamma0=0.2,eps_beta=50, eps_gamma=0.23,
+                                       lmCoefBeta = RDA_SPP_Pilot.lmCoefBeta, lmCoefGamma = RDA_SPP_Pilot.lmCoefGamma,
+                                       Pilot.VarBeta = RDA_SPP_Pilot.VarBeta, Pilot.VarGamma = RDA_SPP_Pilot.VarGamma,
+                                       eps = RDA_SPP_Pilot.0.005eps, R=RDA_SPP_R_hat, T=120000)
 time_end <- Sys.time()
-RDA_SPP_ABCMCMC_p0.005_T120000_1_time <- time_end-time_start
-stopCluster(cl)
-# Time difference of 11.55707 hours
+RDA_SPP_FPABCMCMC_p0.005_T120000_1_time <- time_end-time_start
+# Time difference of 30.66673 mins
 ```
+
+If we construct the Table $3$ shown in Section $7$ of the paper in the `R` code, and store it as `RDA_SPP_comparison_table` in the enviroment, the Figure $7$ of the paper can be recovered by the following code.
+
+```r
+par(mfrow=c(1,2),mai = c(0.25, 0.25, 0.25, 0.05),mgp=c(1.25,0.25,0))
+plot(RDA_SPP_comparison_table[1,5:12],type = "b",ylim=c(0,9000), pch = 20,xaxt="n",xlab = "",ylab = "")
+lines(RDA_SPP_comparison_table[8,5:12],type = "b",col=2, pch = 20)
+lines(RDA_SPP_comparison_table[9,5:12],type = "b",col=3, pch = 20)
+title(xlab = "",ylab = "", main = "Time and ESS plots of Ex and NMH Cases", mgp=c(0.25,0.25,0),cex.main=0.8,cex.lab = 0.6)
+axis(1, at=c(1:8), labels = c("Ex","K2","K3","K4","K5","K6","K7","K8"),cex.axis=0.5)
+legend("topleft", legend=c("Time", TeX(r'(ESS($\beta$))'), TeX(r'(ESS($\gamma$))')),col=1:3, lty=1, cex=0.6)
+# The above line is correct but the Rstudio could not recognize
+
+plot(RDA_SPP_comparison_table[10,5:12],type = "b", pch = 20,ylim=c(0,11),xaxt="n",xlab = "",ylab = "")
+abline(h=RDA_SPP_comparison_table[10,2],col = 2,lty = 2)
+abline(h=RDA_SPP_comparison_table[10,3],col = 3,lty = 3)
+abline(h=RDA_SPP_comparison_table[10,4],col = 4,lty = 4)
+title(xlab = "",ylab = "", main = "ESS(Ave)/s Comparison", mgp=c(0.25,0.25,0),cex.main=0.8,cex.lab = 0.6)
+axis(1, at=c(1:8), labels = c("Ex","K2","K3","K4","K5","K6","K7","K8"),cex.axis=0.5)
+legend("topright", legend=c("NMH Different K Cases", "ABC-MCMC p2.5", "ABC-MCMC p1", "ABC-MCMC p0.5"),
+       col=1:4, lty=c(1,2,3,4), cex=0.6)
+par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42),mgp=c(3,1,0))
+```
+
+Since the code for constructing the table `RDA_SPP_comparison_table` requires hundreds of lines to summarize the output and to integrate all the summary statistics together.
+We propose not to provide more details here.
 
 The box plots Figure $8$ in Section $7$ can be recovered by the following code.
 
@@ -1017,9 +1031,9 @@ boxplot(RDA_SPP_NoisyMH_K1_T1200000_1$beta[200001:1200001],
         RDA_SPP_NoisyMH_K6_T120000_1$beta[20001:120001],
         RDA_SPP_NoisyMH_K7_T120000_1$beta[20001:120001],
         RDA_SPP_NoisyMH_K8_T120000_1$beta[20001:120001],
-        RDA_SPP_ABCMCMC_p0.025_T120000_1$beta[20001:120001],
-        RDA_SPP_ABCMCMC_p0.01_T120000_1$beta[20001:120001],
-        RDA_SPP_ABCMCMC_p0.005_T120000_1$beta[20001:120001],
+        RDA_SPP_FPABCMCMC_p0.025_T120000_1$beta[20001:120001],
+        RDA_SPP_FPABCMCMC_p0.01_T120000_1$beta[20001:120001],
+        RDA_SPP_FPABCMCMC_p0.005_T120000_1$beta[20001:120001],
         xlab = "",ylab = "", main = "",cex.axis = 0.6)
 title(xlab = "",ylab = TeX(r'($\beta$)'), main = "", mgp=c(0.45,0.3,0),cex.main=1,cex.lab = 0.8)
 axis(1, at=c(1:12), labels = c("GT","Ex","K2","K3","K4","K5","K6","K7","K8","p2.5","p1","p0.5"),cex.axis=0.6)
@@ -1034,9 +1048,9 @@ boxplot(RDA_SPP_NoisyMH_K1_T1200000_1$gamma[200001:1200001],
         RDA_SPP_NoisyMH_K6_T120000_1$gamma[20001:120001],
         RDA_SPP_NoisyMH_K7_T120000_1$gamma[20001:120001],
         RDA_SPP_NoisyMH_K8_T120000_1$gamma[20001:120001],
-        RDA_SPP_ABCMCMC_p0.025_T120000_1$gamma[20001:120001],
-        RDA_SPP_ABCMCMC_p0.01_T120000_1$gamma[20001:120001],
-        RDA_SPP_ABCMCMC_p0.005_T120000_1$gamma[20001:120001],
+        RDA_SPP_FPABCMCMC_p0.025_T120000_1$gamma[20001:120001],
+        RDA_SPP_FPABCMCMC_p0.01_T120000_1$gamma[20001:120001],
+        RDA_SPP_FPABCMCMC_p0.005_T120000_1$gamma[20001:120001],
         xlab = "",ylab = "", main = "",cex.axis = 0.6)
 title(xlab = "",ylab = TeX(r'($\gamma$)'), main = "", mgp=c(0.45,0.3,0),cex.main=1,cex.lab = 0.8)
 axis(1, at=c(1:12), labels = c("GT","Ex","K2","K3","K4","K5","K6","K7","K8","p2.5","p1","p0.5"),cex.axis=0.6)
@@ -1051,46 +1065,19 @@ par(mfrow=c(1,2),mai = c(0.25, 0.25, 0.25, 0.05),mgp=c(1.25,0.25,0))
 plot(density(RDA_SPP_NoisyMH_K1_T1200000_1$beta[200001:1200001],bw = 5),xlab = "",ylab="",xlim=c(50,250),ylim=c(0,0.018), main = TeX(r'($\beta$ Posterior Density)'),cex.main=0.8,cex.lab = 0.8,cex.axis = 0.6)
 lines(density(RDA_SPP_NoisyMH_K1_T120000_1$beta[20001:120001],bw = 5),col=2)
 lines(density(RDA_SPP_NoisyMH_K2_T120000_1$beta[20001:120001],bw = 5),col=3)
-lines(density(RDA_SPP_ABCMCMC_p0.005_T120000_1$beta[20001:120001],bw = 5),col = 4)
-legend("topright", legend=c("GT","Ex","NMH K2","ABC p0.5"),
-       col=c(1:4), lty = 1, cex=0.6)
+lines(density(RDA_SPP_FPABCMCMC_p0.025_T120000_1$beta[20001:120001],bw = 5),col = 4)
+lines(density(RDA_SPP_FPABCMCMC_p0.01_T120000_1$beta[20001:120001],bw = 5),col = 5)
+lines(density(RDA_SPP_FPABCMCMC_p0.005_T120000_1$beta[20001:120001],bw = 5),col = 6)
+legend("topright", legend=c("GT","Ex","NMH K2","ABC p2.5","ABC p1","ABC p0.5"),
+       col=c(1:6), lty = 1, cex=0.6)
 
 plot(density(RDA_SPP_NoisyMH_K1_T1200000_1$gamma[200001:1200001],bw = 0.015),xlab = "",ylab="",ylim=c(0,4), main = TeX(r'($\gamma$ Posterior Density)'),cex.main=0.8,cex.lab = 0.8,cex.axis = 0.6)
 lines(density(RDA_SPP_NoisyMH_K1_T120000_1$gamma[20001:120001],bw = 0.015),col=2)
 lines(density(RDA_SPP_NoisyMH_K2_T120000_1$gamma[20001:120001],bw = 0.015),col=3)
-lines(density(RDA_SPP_ABCMCMC_p0.005_T120000_1$gamma[20001:120001],bw = 0.015),col = 4)
-legend("topright", legend=c("GT","Ex","NMH K2","ABC p0.5"),
-       col=c(1:4), lty = 1, cex=0.6)
+lines(density(RDA_SPP_FPABCMCMC_p0.025_T120000_1$gamma[20001:120001],bw = 0.015),col = 4)
+lines(density(RDA_SPP_FPABCMCMC_p0.01_T120000_1$gamma[20001:120001],bw = 0.015),col = 5)
+lines(density(RDA_SPP_FPABCMCMC_p0.005_T120000_1$gamma[20001:120001],bw = 0.015),col = 6)
+legend("topright", legend=c("GT","Ex","NMH K2","ABC p2.5","ABC p1","ABC p0.5"),
+       col=c(1:6), lty = 1, cex=0.6)
 par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42),mgp=c(3,1,0))
 ```
-
-If we construct the Table $3$ shown in Section $7$ of the paper in the `R` code, and store it as `RDA_SPP_comparison_table` in the enviroment, the Figure $10$ of the paper can be recovered by the following code.
-
-```r
-par(mfrow=c(1,2),mai = c(0.25, 0.25, 0.25, 0.05),mgp=c(1.25,0.25,0))
-plot(RDA_SPP_comparison_table[1,5:12],type = "b",ylim=c(0,9000), pch = 20,xaxt="n",xlab = "",ylab = "")
-lines(RDA_SPP_comparison_table[8,5:12],type = "b",col=2, pch = 20)
-lines(RDA_SPP_comparison_table[9,5:12],type = "b",col=3, pch = 20)
-title(xlab = "",ylab = "", main = "Time and ESS plots of Ex and NMH Cases", mgp=c(0.25,0.25,0),cex.main=0.8,cex.lab = 0.6)
-axis(1, at=c(1:8), labels = c("Ex","K2","K3","K4","K5","K6","K7","K8"),cex.axis=0.5)
-legend("topleft", legend=c("Time", TeX(r'(ESS($\beta$))'), TeX(r'(ESS($\gamma$))')),col=1:3, lty=1, cex=0.6)
-# The above line is correct but the Rstudio could not recognize
-
-plot(RDA_SPP_comparison_table[10,5:12],type = "b", pch = 20,ylim=c(0,11),xaxt="n",xlab = "",ylab = "")
-abline(h=RDA_SPP_comparison_table[10,2],col = 2,lty = 2)
-abline(h=RDA_SPP_comparison_table[10,3],col = 3,lty = 2)
-abline(h=RDA_SPP_comparison_table[10,4],col = 4,lty = 2)
-title(xlab = "",ylab = "", main = "ESS(Ave)/s Comparison", mgp=c(0.25,0.25,0),cex.main=0.8,cex.lab = 0.6)
-axis(1, at=c(1:8), labels = c("Ex","K2","K3","K4","K5","K6","K7","K8"),cex.axis=0.5)
-legend("topright", legend=c("NMH Different K Cases", "ABC-MCMC p2.5", "ABC-MCMC p1", "ABC-MCMC p0.5"),
-       col=1:4, lty=c(1,2,2,2), cex=0.6)
-par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42),mgp=c(3,1,0))
-```
-
-Since the code for constructing the table `RDA_SPP_comparison_table` requires hundreds of lines to summarize the outputs and to integrate all the summary statistics together.
-We propose not to provide more details here.
-
-
-
-
-
