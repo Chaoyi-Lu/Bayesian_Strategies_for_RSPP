@@ -71,20 +71,9 @@ SPP_Parallel_Noisy_MH <- function(Y, beta0, gamma0, eps_beta, eps_gamma, R, K, T
 #--------------------------------------------------------------------------------------------------------------------------------------------
 #--------------------------------------------------------------------------------------------------------------------------------------------
 #--------------------------------------------------------------------------------------------------------------------------------------------
+# Fearnhead & Prangle ABC-MCMC main algorithm for Strauss point process
 
-# Shirota & Gelfand ABC-MCMC algorithm for the Strauss point process with approximate parallel running
-
-S.G.ABC.MCMC.Strauss.repeat.draws <- function(x,beta_p_lb,beta_p_ub,gamma_p_lb,gamma_p_ub,R,N_Y,Kfunc_obs_R,lmCoefBeta,lmCoefGamma,Pilot.VarBeta,Pilot.VarGamma,eps){ # Current state beta and gamma
-  beta_p <- runif(1, beta_p_lb, beta_p_ub)
-  gamma_p <- runif(1, gamma_p_lb, gamma_p_ub)
-  X_p <- rStrauss(beta_p,gamma_p,R,square(1)) # Generate SPP
-  Kfunc_X_p <- as.function(Kest(X_p, correction="isotropic")) # Construct the K-function of the proposed X_p w.r.t. r
-  eta_p <- c(log(X_p$n)-log(N_Y),(sqrt(Kfunc_X_p(R))-sqrt(Kfunc_obs_R))^2) # Evaluate the summary statistics c(eta_1, eta_2)
-  psi_p <- (lmCoefBeta[2:3]%*%eta_p)^2/Pilot.VarBeta + (lmCoefGamma[2:3]%*%eta_p)^2/Pilot.VarGamma # Evaluate the distance measure
-  return(c(psi_p<=eps,beta_p,gamma_p))
-}
-
-S.G.Parallel.ABC.MCMC.Strauss <- function(Y, beta0, gamma0, eps_beta, eps_gamma, lmCoefBeta, lmCoefGamma, Pilot.VarBeta, Pilot.VarGamma, eps, R, T){
+F.P.ABC.MCMC.Strauss <- function(Y, beta0, gamma0, eps_beta, eps_gamma, lmCoefBeta, lmCoefGamma, Pilot.VarBeta, Pilot.VarGamma, eps, R, T){
   # Y: Observation in point pattern, i.e. ppp()
   # beta0: initial beta
   # gamma0: initial gamma
@@ -98,14 +87,11 @@ S.G.Parallel.ABC.MCMC.Strauss <- function(Y, beta0, gamma0, eps_beta, eps_gamma,
   # R: estimated radius of SPP, R_hat used for SPP
   
   N_Y <- Y$n
-  Kfunc_obs=as.function(Kest(Y, correction="isotropic")) # Construct the K-function of the observation Y w.r.t. r
+  Kfunc_obs=as.function(Kest(Y, correction="isotropic"))
   Kfunc_obs_R <- Kfunc_obs(R)
   beta_list <- c(beta0)
   gamma_list <- c(gamma0)
   acceptance <- 0
-  NumOfDrawsUntilAcceptance <- c(0) # store the number of draws until while loop stop for each t
-  NumOfAcceptedDrawsInEachNumCoresDraws <- c(0) # store the number of accepted draws when while loop stop for each t
-  NumCores <- detectCores()[1]-1 # Check how many cores used for parallel draws
   
   for (t in 1:T){
     if ((t%%1000) == 0){
@@ -117,29 +103,31 @@ S.G.Parallel.ABC.MCMC.Strauss <- function(Y, beta0, gamma0, eps_beta, eps_gamma,
     gamma_p_lb <- max(0,gamma_list[t]-eps_gamma) # gamma proposal lower bound
     gamma_p_ub <- min(1,gamma_list[t]+eps_gamma) # gamma proposal upper bound
     
-    # Propose and accept the draws
-    drawscount <- 0 # Count the number of draws until that the acceptance condition is satisfied
-    repeat{
-      # Parallel propose the NumCores draws as well as the acceptance or not, 
-      # The output is a 3 X NumCores matrix whose first row are psi_p<=eps; The second, third rows are beta_p and gamma_p
-      Flag_psi_and_theta_p <- parSapply(cl, 1:NumCores, S.G.ABC.MCMC.Strauss.repeat.draws, beta_p_lb=beta_p_lb,beta_p_ub=beta_p_ub,gamma_p_lb=gamma_p_lb,gamma_p_ub=gamma_p_ub,
-                                        R=R,N_Y=N_Y,Kfunc_obs_R=Kfunc_obs_R,lmCoefBeta=lmCoefBeta,lmCoefGamma=lmCoefGamma,Pilot.VarBeta=Pilot.VarBeta,Pilot.VarGamma=Pilot.VarGamma,eps=eps)
-      if (sum(Flag_psi_and_theta_p[1,])>0){ # We stop the repeat loop if any of the NumCores draws satisfy the condition, i.e. psi_p<=eps
-        NumOfDrawsUntilAcceptance[t+1] <- drawscount + which.max(Flag_psi_and_theta_p[1,])
-        break
+    beta_p <- runif(1, beta_p_lb, beta_p_ub)
+    gamma_p <- runif(1, gamma_p_lb, gamma_p_ub)
+    X_p <- rStrauss(beta_p,gamma_p,R,square(1))
+    Kfunc_X_p <- as.function(Kest(X_p, correction="isotropic"))
+    eta_p <- c(log(X_p$n)-log(N_Y),(sqrt(Kfunc_X_p(R))-sqrt(Kfunc_obs_R))^2)
+    psi_p <- (lmCoefBeta[2:3]%*%eta_p)^2/Pilot.VarBeta + (lmCoefGamma[2:3]%*%eta_p)^2/Pilot.VarGamma
+    
+    if (psi_p<=eps){
+      # Determine alpha ratio which is the ratio of proposal because priors are uniform distributions
+      log_alpha_right <- log(beta_p_ub-beta_p_lb) + log(gamma_p_ub-gamma_p_lb) - 
+        log(min(400,beta_p+eps_beta)-max(50,beta_p-eps_beta)) - log(min(1,gamma_p+eps_gamma)-max(0,gamma_p-eps_gamma))
+      if (log(runif(1)) <= min(0, log_alpha_right)){
+        acceptance <- acceptance + 1
+        beta_list[t+1] <- beta_p # update theta list
+        gamma_list[t+1] <- gamma_p
       }else{
-        drawscount <- drawscount + NumCores
+        beta_list[t+1] <- beta_list[t] # update theta list
+        gamma_list[t+1] <- gamma_list[t]
       }
+    }else{
+      beta_list[t+1] <- beta_list[t] # update theta list
+      gamma_list[t+1] <- gamma_list[t]
     }
-    # it's possible that two or more acceptances happen within one round of NumCores draws 
-    # so we pick the first one as the proposed state
-    theta_p <- Flag_psi_and_theta_p[2:3,which.max(Flag_psi_and_theta_p[1,])] 
-    beta_list[t+1] <- theta_p[1]
-    gamma_list[t+1] <- theta_p[2]
-    NumOfAcceptedDrawsInEachNumCoresDraws[t+1] <- sum(Flag_psi_and_theta_p[1,])
   }
-  return(list(beta = beta_list, gamma = gamma_list,
-              NumOfDrawsUntilAcceptance = NumOfDrawsUntilAcceptance,NumOfAcceptedDrawsInEachNumCoresDraws = NumOfAcceptedDrawsInEachNumCoresDraws))
+  return(list(beta = beta_list, gamma = gamma_list, AcceptanceRate = acceptance/T))
 }
 
 #--------------------------------------------------------------------------------------------------------------------------------------------
@@ -347,20 +335,9 @@ Approx_dppG_Parallel_Noisy_MH <- function(Y, tau0, sigma0, eps_tau, eps_sigma, K
 #--------------------------------------------------------------------------------------------------------------------------------------------
 #--------------------------------------------------------------------------------------------------------------------------------------------
 
-# Shirota & Gelfand ABC-MCMC algorithm for determinantal point process Gaussian model with approximate parallel running
+# Fearnhead & Prangle ABC-MCMC main algorithm for determinantal point process Gaussian model
 
-S.G.ABC.MCMC.dppG.repeat.draws <- function(x,tau_p_lb,tau_p_ub,sigma_p_lb,sigma_c,eps_sigma,r_M,N_Y,Kfunc_obs_rM,lmCoefTau,lmCoefSigma,Pilot.VarTau,Pilot.VarSigma,eps){ # Current state tau and sigma
-  tau_p <- runif(1, tau_p_lb, tau_p_ub)
-  sigma_p_ub <- min(1/sqrt(pi*tau_p),sigma_c+eps_sigma) # sigma proposal upper bound
-  sigma_p <- runif(1, sigma_p_lb, sigma_p_ub)
-  X_p <- simulate(dppGauss(lambda=tau_p, alpha=sigma_p, d=2))
-  Kfunc_X_p <- as.function(Kest(X_p, correction="isotropic"))
-  eta_p <- c(log(X_p$n)-log(N_Y),(sqrt(Kfunc_X_p(r_M))-sqrt(Kfunc_obs_rM))^2)
-  psi_p <- (lmCoefTau[2:12]%*%eta_p)^2/Pilot.VarTau + (lmCoefSigma[2:12]%*%eta_p)^2/Pilot.VarSigma
-  return(c(psi_p<=eps,tau_p,sigma_p))
-}
-
-S.G.Parallel.ABC.MCMC.dppG <- function(Y, tau0, sigma0, eps_tau, eps_sigma, lmCoefTau, lmCoefSigma, Pilot.VarTau, Pilot.VarSigma, eps, r_M, T){
+F.P.ABC.MCMC.dppG <- function(Y, tau0, sigma0, eps_tau, eps_sigma, lmCoefTau, lmCoefSigma, Pilot.VarTau, Pilot.VarSigma, eps, r_M, T){
   # Y: Observation in point pattern, i.e. ppp()
   # tau0: initial tau
   # sigma0: initial sigma
@@ -379,43 +356,40 @@ S.G.Parallel.ABC.MCMC.dppG <- function(Y, tau0, sigma0, eps_tau, eps_sigma, lmCo
   tau_list <- c(tau0)
   sigma_list <- c(sigma0)
   acceptance <- 0
-  NumOfDrawsUntilAcceptance <- c(0) # store the number of draws until while loop stop for each t
-  NumOfAcceptedDrawsInEachNumCoresDraws <- c(0) # store the number of accepted draws when while loop stop for each t
-  NumCores <- detectCores()[1]-1 # Check how many cores used for parallel draws
   
   for (t in 1:T){
-    if ((t%%1000) == 0){
+    if ((t%%100) == 0){
       print(t)
     }
     #Define proposal bounds
     tau_p_lb <- max(50,tau_list[t]-eps_tau) # tau proposal lower bound
     tau_p_ub <- min(200,tau_list[t]+eps_tau) # tau proposal upper bound
+    tau_p <- runif(1, tau_p_lb, tau_p_ub)
     sigma_p_lb <- max(0.001,sigma_list[t]-eps_sigma) # sigma proposal lower bound
-    
-    # Propose and accept the draws
-    drawscount <- 0
-    repeat{ # generate proposed states until psi < eps
-      # Parallel propose the NumCores draws as well as the acceptance or not, 
-      # The output is a 3 X NumCores matrix whose first row are psi_p<=eps, second, third rows are tau_p and sigma_p
-      Flag_psi_and_theta_p <- 
-        parSapply(cl, 1:NumCores, S.G.ABC.MCMC.dppG.repeat.draws, tau_p_lb=tau_p_lb,tau_p_ub=tau_p_ub,sigma_p_lb=sigma_p_lb,sigma_c=sigma_list[t],eps_sigma=eps_sigma,
-                  r_M=r_M,N_Y=N_Y,Kfunc_obs_rM=Kfunc_obs_rM,lmCoefTau=lmCoefTau,lmCoefSigma=lmCoefSigma,Pilot.VarTau=Pilot.VarTau,Pilot.VarSigma=Pilot.VarSigma,eps=eps)
-      if (sum(Flag_psi_and_theta_p[1,])>0){ # We stop the repeat loop if any of the NumCores draws satisfy the condition, i.e. psi_p<=eps
-        NumOfDrawsUntilAcceptance[t+1] <- drawscount + which.max(Flag_psi_and_theta_p[1,])
-        break
+    sigma_p_ub <- min(1/sqrt(pi*tau_p),sigma_list[t]+eps_sigma) # sigma proposal upper bound
+    sigma_p <- runif(1, sigma_p_lb, sigma_p_ub)
+    X_p <- simulate(dppGauss(lambda=tau_p, alpha=sigma_p, d=2))
+    Kfunc_X_p <- as.function(Kest(X_p, correction="isotropic"))
+    eta_p <- c(log(X_p$n)-log(N_Y),(sqrt(Kfunc_X_p(r_M))-sqrt(Kfunc_obs_rM))^2)
+    psi_p <- (lmCoefTau[2:12]%*%eta_p)^2/Pilot.VarTau + (lmCoefSigma[2:12]%*%eta_p)^2/Pilot.VarSigma
+    if (psi_p<=eps){
+      # Determine alpha ratio which is the ratio of proposal because priors are uniform distributions
+      log_alpha_right <- log(tau_p_ub-tau_p_lb) + log(sigma_p_ub-sigma_p_lb) - 
+        log(min(200,tau_p+eps_tau)-max(50,tau_p-eps_tau)) - log(min(1/sqrt(pi*tau_list[t]),sigma_p+eps_sigma)-max(0.001,sigma_p-eps_sigma))
+      if (log(runif(1)) <= min(0, log_alpha_right)){
+        acceptance <- acceptance + 1
+        tau_list[t+1] <- tau_p # update theta list
+        sigma_list[t+1] <- sigma_p
       }else{
-        drawscount <- drawscount + NumCores
+        tau_list[t+1] <- tau_list[t] # update theta list
+        sigma_list[t+1] <- sigma_list[t]
       }
+    }else{
+      tau_list[t+1] <- tau_list[t] # update theta list
+      sigma_list[t+1] <- sigma_list[t]
     }
-    # it's possible that two or more acceptances happen within one round of NumCores draws 
-    # so we pick the first one as the proposed state
-    theta_p <- Flag_psi_and_theta_p[2:3,which.max(Flag_psi_and_theta_p[1,])] 
-    tau_list[t+1] <- theta_p[1]
-    sigma_list[t+1] <- theta_p[2]
-    NumOfAcceptedDrawsInEachNumCoresDraws[t+1] <- sum(Flag_psi_and_theta_p[1,])
   }
-  return(list(tau = tau_list, sigma = sigma_list,
-              NumOfDrawsUntilAcceptance = NumOfDrawsUntilAcceptance,NumOfAcceptedDrawsInEachNumCoresDraws = NumOfAcceptedDrawsInEachNumCoresDraws))
+  return(list(tau = tau_list, sigma = sigma_list, AcceptanceRate = acceptance/T))
 }
 
 
@@ -492,21 +466,11 @@ df_SPP_Parallel_Noisy_MH <- function(Y, beta0, gamma0, eps_beta, eps_gamma, R, K
 #--------------------------------------------------------------------------------------------------------------------------------------------
 #--------------------------------------------------------------------------------------------------------------------------------------------
 
-# Shirota & Gelfand ABC-MCMC algorithm for Strauss point process with approximate parallel running
-# The functions below are designed for real duke forest data application
-# The only difference compared to simulation study 1 functions is the prior settings
+# Fearnhead & Prangle ABC-MCMC main algorithm for Strauss point process
+# The functions below are designed for real data application
+# The only difference compared with SS1 is the prior range
 
-S.G.ABC.MCMC.Strauss.repeat.draws <- function(x,beta_p_lb,beta_p_ub,gamma_p_lb,gamma_p_ub,R,N_Y,Kfunc_obs_R,lmCoefBeta,lmCoefGamma,Pilot.VarBeta,Pilot.VarGamma,eps){ # Current state beta and gamma
-  beta_p <- runif(1, beta_p_lb, beta_p_ub)
-  gamma_p <- runif(1, gamma_p_lb, gamma_p_ub)
-  X_p <- rStrauss(beta_p,gamma_p,R,square(1))
-  Kfunc_X_p <- as.function(Kest(X_p, correction="isotropic"))
-  eta_p <- c(log(X_p$n)-log(N_Y),(sqrt(Kfunc_X_p(R))-sqrt(Kfunc_obs_R))^2)
-  psi_p <- (lmCoefBeta[2:3]%*%eta_p)^2/Pilot.VarBeta + (lmCoefGamma[2:3]%*%eta_p)^2/Pilot.VarGamma
-  return(c(psi_p<=eps,beta_p,gamma_p))
-}
-
-df.S.G.Parallel.ABC.MCMC.Strauss <- function(Y, beta0, gamma0, eps_beta, eps_gamma, lmCoefBeta, lmCoefGamma, Pilot.VarBeta, Pilot.VarGamma, eps, R, T){
+df.F.P.ABC.MCMC.Strauss <- function(Y, beta0, gamma0, eps_beta, eps_gamma, lmCoefBeta, lmCoefGamma, Pilot.VarBeta, Pilot.VarGamma, eps, R, T){
   # Y: Observation in point pattern, i.e. ppp()
   # beta0: initial beta
   # gamma0: initial gamma
@@ -525,10 +489,8 @@ df.S.G.Parallel.ABC.MCMC.Strauss <- function(Y, beta0, gamma0, eps_beta, eps_gam
   beta_list <- c(beta0)
   gamma_list <- c(gamma0)
   acceptance <- 0
-  NumOfDrawsUntilAcceptance <- c(0) # store the number of draws until while loop stop for each t
-  NumOfAcceptedDrawsInEachNumCoresDraws <- c(0) # store the number of accepted draws when while loop stop for each t
   
-  NumCores <- detectCores()[1]-1 # Check how many cores used for parallel draws
+  NumCores <- 7 # Check how many cores used for parallel draws
   
   for (t in 1:T){
     if ((t%%1000) == 0){
@@ -540,27 +502,29 @@ df.S.G.Parallel.ABC.MCMC.Strauss <- function(Y, beta0, gamma0, eps_beta, eps_gam
     gamma_p_lb <- max(0,gamma_list[t]-eps_gamma) # gamma proposal lower bound
     gamma_p_ub <- min(1,gamma_list[t]+eps_gamma) # gamma proposal upper bound
     
-    # Propose and accept the draws
-    drawscount <- 0
-    repeat{
-      # Parallel propose the NumCores draws as well as the acceptance or not, 
-      # The output is a 3 X NumCores matrix whose first row are psi_p<=eps, third rows are beta_p and gamma_p
-      Flag_psi_and_theta_p <- parSapply(cl, 1:NumCores, S.G.ABC.MCMC.Strauss.repeat.draws, beta_p_lb=beta_p_lb,beta_p_ub=beta_p_ub,gamma_p_lb=gamma_p_lb,gamma_p_ub=gamma_p_ub,
-                                        R=R,N_Y=N_Y,Kfunc_obs_R=Kfunc_obs_R,lmCoefBeta=lmCoefBeta,lmCoefGamma=lmCoefGamma,Pilot.VarBeta=Pilot.VarBeta,Pilot.VarGamma=Pilot.VarGamma,eps=eps)
-      if (sum(Flag_psi_and_theta_p[1,])>0){ # We stop the repeat loop if any of the NumCores draws satisfy the condition, i.e. psi_p<=eps
-        NumOfDrawsUntilAcceptance[t+1] <- drawscount + which.max(Flag_psi_and_theta_p[1,])
-        break
+    beta_p <- runif(1, beta_p_lb, beta_p_ub)
+    gamma_p <- runif(1, gamma_p_lb, gamma_p_ub)
+    X_p <- rStrauss(beta_p,gamma_p,R,square(1))
+    Kfunc_X_p <- as.function(Kest(X_p, correction="isotropic"))
+    eta_p <- c(log(X_p$n)-log(N_Y),(sqrt(Kfunc_X_p(R))-sqrt(Kfunc_obs_R))^2)
+    psi_p <- (lmCoefBeta[2:3]%*%eta_p)^2/Pilot.VarBeta + (lmCoefGamma[2:3]%*%eta_p)^2/Pilot.VarGamma
+    
+    if (psi_p<=eps){
+      # Determine alpha ratio which is the ratio of proposal because priors are uniform distributions
+      log_alpha_right <- log(beta_p_ub-beta_p_lb) + log(gamma_p_ub-gamma_p_lb) - 
+        log(min(350,beta_p+eps_beta)-max(50,beta_p-eps_beta)) - log(min(1,gamma_p+eps_gamma)-max(0,gamma_p-eps_gamma))
+      if (log(runif(1)) <= min(0, log_alpha_right)){
+        acceptance <- acceptance + 1
+        beta_list[t+1] <- beta_p # update theta list
+        gamma_list[t+1] <- gamma_p
       }else{
-        drawscount <- drawscount + NumCores
+        beta_list[t+1] <- beta_list[t] # update theta list
+        gamma_list[t+1] <- gamma_list[t]
       }
+    }else{
+      beta_list[t+1] <- beta_list[t] # update theta list
+      gamma_list[t+1] <- gamma_list[t]
     }
-    # it's possible that two or more acceptances happen within one round of NumCores draws 
-    # so we pick the first one as the proposed state
-    theta_p <- Flag_psi_and_theta_p[2:3,which.max(Flag_psi_and_theta_p[1,])] 
-    beta_list[t+1] <- theta_p[1]
-    gamma_list[t+1] <- theta_p[2]
-    NumOfAcceptedDrawsInEachNumCoresDraws[t+1] <- sum(Flag_psi_and_theta_p[1,])
   }
-  return(list(beta = beta_list, gamma = gamma_list,
-              NumOfDrawsUntilAcceptance = NumOfDrawsUntilAcceptance,NumOfAcceptedDrawsInEachNumCoresDraws = NumOfAcceptedDrawsInEachNumCoresDraws))
+  return(list(beta = beta_list, gamma = gamma_list, AcceptanceRate = acceptance/T))
 }
