@@ -437,12 +437,12 @@ The `dppG_logDensity()` function in the [`Algorithm_Functions_for_RSPP.R`] evalu
 Within such a function, several inbuilt functions from the package `spatstat` are applied for the evaluation.
 The inbuilt function `fourierbasisraw()` evaluates the Fourier basis functions, and the inbuilt function `dppeigen()` returns the set of $\boldsymbol{k}$'s as well as the spectral density evaluated at those $\boldsymbol{k}$'s which are required for the evaluation of the log density.
 The `dppG_MH()` function implements the Metropolis-Hastings algorithm for dppG which is available due to the tractability of the likelihood normalising term of the $\hat{X}_S$.
-The function `dppG_Noisy_E_kth_Ratio()`, which is similar as that in SPP cases, calculates the unnormalised likelihood ratio $\frac{q(x_k'|\theta^{(t-1)})}{q(x_k'|\theta')}$ for the $k$ th auxiliary draw of the noisy M-H algorithm.
-The function `dppG_Parallel_Noisy_MH()` implements the exchange or the noisy M-H algorithm for dppG with parallel computation.
+The function `dppG_Noisy_E_kth_Ratio()`, which is similar to that in SPP cases, calculates the unnormalised likelihood ratio $\frac{q(x_k'|\theta^{(t-1)})}{q(x_k'|\theta')}$ for the $k$ th auxiliary draw of the noisy M-H algorithm.
+The function `dppG_Parallel_Noisy_MH()` implements the exchange or noisy M-H algorithms for dppG with parallel computation.
 
 Recall here that we propose to apply an approximation of the unnormalised likelihood function for $\hat{X}_S$ in order to improve the efficiency.
 The functions `Approx_dppG_Noisy_E_kth_Ratio()` and `Approx_dppG_Parallel_Noisy_MH()` correspond to the approximate exchange or the approximate noisy M-H algorithm.
-The ABC-MCMC functions for dppG, `S.G.ABC.MCMC.dppG.repeat.draws()` and `S.G.Parallel.ABC.MCMC.dppG()`, are similar as those of SPP cases and the only difference is that the summary statistic $\boldsymbol{\eta_2}$ is now evaluated at $10$ equally spaced $r_i$'s from $i=1$ to $i=10$ as we discussed in the end of Section $5$ of the paper.
+The ABC-MCMC function for dppG, `F.P.ABC.MCMC.dppG()`, is similar to that of SPP case, and the only difference is that the summary statistic $\boldsymbol{\eta_2}$ is now evaluated at $10$ equally spaced $r_i$'s from $i=1$ to $i=10$ as we discussed in the end of Section $5$ of the paper.
 
 The ground truth in this dppG simulation study is to implement the M-H algorithm for $120,000$ iterations with $20,000$ burn-in.
 The initial states are set as $\tau_0=125,\sigma_0=0.04$ and the proposal epsilons are tuned to be $\epsilon_{\tau}=32, \epsilon_{\sigma}=0.015$.
@@ -644,38 +644,41 @@ SS2_dppG_Pilot.0.01eps <- quantile(SS2_dppG_Pilot.psi,probs=0.01)[[1]]
 SS2_dppG_Pilot.0.025eps <- quantile(SS2_dppG_Pilot.psi,probs=0.025)[[1]]
 ```
 
-The main implementation code of the ABC-MCMC algorithm with the approximate parallel computation is following for the two cases $p=0.01$ and $p=0.005$.
+The main implementation code of the ABC-MCMC algorithm is shown below.
 
 ``` r
-## ABC-MCMC algorithm for dppG with approximate parallel computation p0.01
-NumCores <- detectCores()[1]-1
-cl <- parallel::makeCluster(NumCores)
-clusterExport(cl=cl, list("simulate", "dppGauss","Kest")) # In order to use this function for parallel computation
+## Fearnhead and Prangle ABC-MCMC main algorithm for dppG p0.025
 time_start <- Sys.time()
-SS2_dppG_Tau100_Sigma0.05_ABCMCMC_p0.01_T12000_1 <- 
-  S.G.Parallel.ABC.MCMC.dppG(Y = SS2_dppG_Tau100_Sigma0.05_ObsY, tau0=125, sigma0=0.04,eps_tau=32, eps_sigma=0.015, 
-                             lmCoefTau = SS2_dppG_Pilot.lmCoefTau, lmCoefSigma = SS2_dppG_Pilot.lmCoefSigma, 
-                             Pilot.VarTau = SS2_dppG_Pilot.VarTau, Pilot.VarSigma = SS2_dppG_Pilot.VarSigma, 
-                             eps = SS2_dppG_Pilot.0.01eps, r_M=seq(0.01,0.1,0.01), T=12000)
+SS2_dppG_Tau100_Sigma0.05_FPABCMCMC_p0.025_T12000_1 <- 
+  F.P.ABC.MCMC.dppG(Y = SS2_dppG_Tau100_Sigma0.05_ObsY, tau0=125, sigma0=0.04,eps_tau=32, eps_sigma=0.015, 
+                                 lmCoefTau = SS2_dppG_Pilot.lmCoefTau, lmCoefSigma = SS2_dppG_Pilot.lmCoefSigma, 
+                                 Pilot.VarTau = SS2_dppG_Pilot.VarTau, Pilot.VarSigma = SS2_dppG_Pilot.VarSigma, 
+                                 eps = SS2_dppG_Pilot.0.025eps, r_M=seq(0.01,0.1,0.01), T=12000)
 time_end <- Sys.time()
-SS2_dppG_Tau100_Sigma0.05_ABCMCMC_p0.01_T12000_1_time <- time_end-time_start
-stopCluster(cl)
-# Time difference of 11.67918 hours
+SS2_dppG_Tau100_Sigma0.05_FPABCMCMC_p0.025_T12000_1_time <- time_end-time_start
+# Time difference of 2.648011 hours
 
-## ABC-MCMC algorithm for dppG with approximate parallel computation p0.005
-NumCores <- detectCores()[1]-1
-cl <- parallel::makeCluster(NumCores)
-clusterExport(cl=cl, list("simulate", "dppGauss","Kest")) # In order to use this function for parallel computation
+## Fearnhead and Prangle ABC-MCMC main algorithm for dppG p0.01
 time_start <- Sys.time()
-SS2_dppG_Tau100_Sigma0.05_ABCMCMC_p0.005_T12000_1 <- 
-  S.G.Parallel.ABC.MCMC.dppG(Y = SS2_dppG_Tau100_Sigma0.05_ObsY, tau0=125, sigma0=0.04,eps_tau=32, eps_sigma=0.015, 
-                             lmCoefTau = SS2_dppG_Pilot.lmCoefTau, lmCoefSigma = SS2_dppG_Pilot.lmCoefSigma, 
-                             Pilot.VarTau = SS2_dppG_Pilot.VarTau, Pilot.VarSigma = SS2_dppG_Pilot.VarSigma, 
-                             eps = SS2_dppG_Pilot.0.005eps, r_M=seq(0.01,0.1,0.01), T=12000)
+SS2_dppG_Tau100_Sigma0.05_FPABCMCMC_p0.01_T12000_1 <- 
+  F.P.ABC.MCMC.dppG(Y = SS2_dppG_Tau100_Sigma0.05_ObsY, tau0=125, sigma0=0.04,eps_tau=32, eps_sigma=0.015, 
+                                 lmCoefTau = SS2_dppG_Pilot.lmCoefTau, lmCoefSigma = SS2_dppG_Pilot.lmCoefSigma, 
+                                 Pilot.VarTau = SS2_dppG_Pilot.VarTau, Pilot.VarSigma = SS2_dppG_Pilot.VarSigma, 
+                                 eps = SS2_dppG_Pilot.0.01eps, r_M=seq(0.01,0.1,0.01), T=12000)
 time_end <- Sys.time()
-SS2_dppG_Tau100_Sigma0.05_ABCMCMC_p0.005_T12000_1_time <- time_end-time_start
-stopCluster(cl)
-# Time difference of 21.44336 hours
+SS2_dppG_Tau100_Sigma0.05_FPABCMCMC_p0.01_T12000_1_time <- time_end-time_start
+# Time difference of 2.646827 hours
+
+## Fearnhead and Prangle ABC-MCMC main algorithm for dppG p0.005
+time_start <- Sys.time()
+SS2_dppG_Tau100_Sigma0.05_FPABCMCMC_p0.005_T12000_1 <- 
+  F.P.ABC.MCMC.dppG(Y = SS2_dppG_Tau100_Sigma0.05_ObsY, tau0=125, sigma0=0.04,eps_tau=32, eps_sigma=0.015, 
+                                 lmCoefTau = SS2_dppG_Pilot.lmCoefTau, lmCoefSigma = SS2_dppG_Pilot.lmCoefSigma, 
+                                 Pilot.VarTau = SS2_dppG_Pilot.VarTau, Pilot.VarSigma = SS2_dppG_Pilot.VarSigma, 
+                                 eps = SS2_dppG_Pilot.0.005eps, r_M=seq(0.01,0.1,0.01), T=12000)
+time_end <- Sys.time()
+SS2_dppG_Tau100_Sigma0.05_FPABCMCMC_p0.005_T12000_1_time <- time_end-time_start
+# Time difference of 2.631271 hours
 ```
 
 The plot of the point locations of the SS2 aritificial dataset shown as Figure $4$ in Section $6.2$ can be recovered by the following code.
@@ -687,7 +690,7 @@ title(main = "", mgp=c(1,0.25,0),cex.main=1,cex.lab = 0.8)
 par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42),mgp=c(3,1,0))
 ```
 
-The trace plots of the outputs for the algorithms shown as Figure $5$ can be recovered by:
+The trace plots of the output for the algorithms shown as Figure $5$ can be recovered by:
 
 ```r
 par(mfrow=c(2,6),mai = c(0.15, 0.15, 0.15, 0.01),mgp=c(0.75,0.25,0))
@@ -696,14 +699,14 @@ plot(SS2_dppG_Tau100_Sigma0.05_NoisyMH_K1_T12000_1$tau[2001:12001], type = "l",x
 plot(SS2_dppG_Tau100_Sigma0.05_NoisyMH_K2_T12000_1$tau[2001:12001], type = "l",xlab = "",ylab = "", main = "NMH K2",cex.axis = 0.9,cex.main=1, ylim=c(65,145))
 plot(Approx_SS2_dppG_Tau100_Sigma0.05_NoisyMH_K1_T12000_1$tau[2001:12001], type = "l",xlab = "",ylab = "", main = TeX(r'(Ex$^{app}$)',bold = TRUE),cex.axis = 0.9,cex.main=1, ylim=c(65,145))
 plot(Approx_SS2_dppG_Tau100_Sigma0.05_NoisyMH_K2_T12000_1$tau[2001:12001], type = "l",xlab = "",ylab = "", main = TeX(r'(NMH$^{app}$ K2)',bold = TRUE),cex.axis = 0.9,cex.main=1, ylim=c(65,145))
-plot(SS2_dppG_Tau100_Sigma0.05_ABCMCMC_p0.005_T12000_1$tau[2001:12001], type = "l",xlab = "",ylab = "", main = "ABC p0.5",cex.axis = 0.9,cex.main=1, ylim=c(65,145))
+plot(SS2_dppG_Tau100_Sigma0.05_FPABCMCMC_p0.01_T12000_1$tau[2001:12001], type = "l",xlab = "",ylab = "", main = "ABC p1",cex.axis = 0.9,cex.main=1, ylim=c(65,145))
 
 plot(SS2_dppG_Tau100_Sigma0.05_MH_T12000_1$sigma[2001:12001], type = "l",xlab = "",ylab = "", main = "MH",cex.axis = 0.9,cex.main=1, ylim=c(0.018,0.063))
 plot(SS2_dppG_Tau100_Sigma0.05_NoisyMH_K1_T12000_1$sigma[2001:12001], type = "l",xlab = "",ylab = "", main = "Ex",cex.axis = 0.9,cex.main=1, ylim=c(0.018,0.063))
 plot(SS2_dppG_Tau100_Sigma0.05_NoisyMH_K2_T12000_1$sigma[2001:12001], type = "l",xlab = "",ylab = "", main = "NMH K2",cex.axis = 0.9,cex.main=1, ylim=c(0.018,0.063))
 plot(Approx_SS2_dppG_Tau100_Sigma0.05_NoisyMH_K1_T12000_1$sigma[2001:12001], type = "l",xlab = "",ylab = "", main = TeX(r'(Ex$^{app}$)',bold = TRUE),cex.axis = 0.9,cex.main=1, ylim=c(0.018,0.063))
 plot(Approx_SS2_dppG_Tau100_Sigma0.05_NoisyMH_K2_T12000_1$sigma[2001:12001], type = "l",xlab = "",ylab = "", main = TeX(r'(NMH$^{app}$ K2)',bold = TRUE),cex.axis = 0.9,cex.main=1, ylim=c(0.018,0.063))
-plot(SS2_dppG_Tau100_Sigma0.05_ABCMCMC_p0.005_T12000_1$sigma[2001:12001], type = "l",xlab = "",ylab = "", main = "ABC p0.5",cex.axis = 0.9,cex.main=1, ylim=c(0.018,0.063))
+plot(SS2_dppG_Tau100_Sigma0.05_FPABCMCMC_p0.01_T12000_1$sigma[2001:12001], type = "l",xlab = "",ylab = "", main = "ABC p1",cex.axis = 0.9,cex.main=1, ylim=c(0.018,0.063))
 par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42),mgp=c(3,1,0))
 ```
 
@@ -717,21 +720,21 @@ lines(density(SS2_dppG_Tau100_Sigma0.05_NoisyMH_K1_T12000_1$tau[2001:12001],bw =
 lines(density(SS2_dppG_Tau100_Sigma0.05_NoisyMH_K2_T12000_1$tau[2001:12001],bw = 4), col = 4)
 lines(density(Approx_SS2_dppG_Tau100_Sigma0.05_NoisyMH_K1_T12000_1$tau[2001:12001],bw = 4), col = 5)
 lines(density(Approx_SS2_dppG_Tau100_Sigma0.05_NoisyMH_K2_T12000_1$tau[2001:12001],bw = 4), col = 6)
-lines(density(SS2_dppG_Tau100_Sigma0.05_ABCMCMC_p0.01_T12000_1$tau[2001:12001],bw = 4), col = 7)
-lines(density(SS2_dppG_Tau100_Sigma0.05_ABCMCMC_p0.005_T12000_1$tau[2001:12001],bw = 4), col = 8)
-legend("topright", legend=c("GT","MH","Ex","NMH K2",TeX(r'(Ex$^{app}$)'),TeX(r'(NMH$^{app}$ K2)'),"ABC p1","ABC p0.5"),
-       col=c(1:8), lty = 1, cex=0.6)
+lines(density(SS2_dppG_Tau100_Sigma0.05_FPABCMCMC_p0.025_T12000_1$tau[2001:12001],bw = 4), col = 7)
+lines(density(SS2_dppG_Tau100_Sigma0.05_FPABCMCMC_p0.01_T12000_1$tau[2001:12001],bw = 4), col = 8)
+lines(density(SS2_dppG_Tau100_Sigma0.05_FPABCMCMC_p0.005_T12000_1$tau[2001:12001],bw = 4), col = "rosybrown")
+legend("topright", legend=c("GT","MH","Ex","NMH K2",TeX(r'(Ex$^{app}$)'),TeX(r'(NMH$^{app}$ K2)'),"ABC p2.5","ABC p1","ABC p0.5"),col=c(1:8,"rosybrown"), lty = 1, cex=0.6)
 
-plot(density(SS2_ApproxdppG_Tau100_Sigma0.05_MH_T120000_1$sigma[20001:120001],bw = 0.002),ylim=c(0,90),xlab = "",ylab="", main = TeX(r'($\sigma$ Posterior Density)'),cex.main=0.8,cex.lab = 0.8,cex.axis = 0.6)
-lines(density(SS2_dppG_Tau100_Sigma0.05_MH_T12000_1$sigma[2001:12001],bw = 0.002), col = 2)
-lines(density(SS2_dppG_Tau100_Sigma0.05_NoisyMH_K1_T12000_1$sigma[2001:12001],bw = 0.002), col = 3)
-lines(density(SS2_dppG_Tau100_Sigma0.05_NoisyMH_K2_T12000_1$sigma[2001:12001],bw = 0.002), col = 4)
-lines(density(Approx_SS2_dppG_Tau100_Sigma0.05_NoisyMH_K1_T12000_1$sigma[2001:12001],bw = 0.002), col = 5)
-lines(density(Approx_SS2_dppG_Tau100_Sigma0.05_NoisyMH_K2_T12000_1$sigma[2001:12001],bw = 0.002), col = 6)
-lines(density(SS2_dppG_Tau100_Sigma0.05_ABCMCMC_p0.01_T12000_1$sigma[2001:12001],bw = 0.002), col = 7)
-lines(density(SS2_dppG_Tau100_Sigma0.05_ABCMCMC_p0.005_T12000_1$sigma[2001:12001],bw = 0.002), col = 8)
-legend("topleft", legend=c("GT","MH","Ex","NMH K2",TeX(r'(Ex$^{app}$)'),TeX(r'(NMH$^{app}$ K2)'),"ABC p1","ABC p0.5"),
-       col=c(1:8), lty = 1, cex=0.6)
+plot(density(SS2_dppG_Tau100_Sigma0.05_MH_T120000_1$sigma[20001:120001],bw = 0.004),ylim=c(0,70),xlab = "",ylab="", main = TeX(r'($\sigma$ Posterior Density)'),cex.main=0.8,cex.lab = 0.8,cex.axis = 0.6)
+lines(density(SS2_dppG_Tau100_Sigma0.05_MH_T12000_1$sigma[2001:12001],bw = 0.004), col = 2)
+lines(density(SS2_dppG_Tau100_Sigma0.05_NoisyMH_K1_T12000_1$sigma[2001:12001],bw = 0.004), col = 3)
+lines(density(SS2_dppG_Tau100_Sigma0.05_NoisyMH_K2_T12000_1$sigma[2001:12001],bw = 0.004), col = 4)
+lines(density(Approx_SS2_dppG_Tau100_Sigma0.05_NoisyMH_K1_T12000_1$sigma[2001:12001],bw = 0.004), col = 5)
+lines(density(Approx_SS2_dppG_Tau100_Sigma0.05_NoisyMH_K2_T12000_1$sigma[2001:12001],bw = 0.004), col = 6)
+lines(density(SS2_dppG_Tau100_Sigma0.05_FPABCMCMC_p0.025_T12000_1$sigma[2001:12001],bw = 0.004), col = 7)
+lines(density(SS2_dppG_Tau100_Sigma0.05_FPABCMCMC_p0.01_T12000_1$sigma[2001:12001],bw = 0.004), col = 8)
+lines(density(SS2_dppG_Tau100_Sigma0.05_FPABCMCMC_p0.005_T12000_1$sigma[2001:12001],bw = 0.004), col = "rosybrown")
+legend("topleft", legend=c("GT","MH","Ex","NMH K2",TeX(r'(Ex$^{app}$)'),TeX(r'(NMH$^{app}$ K2)'),"ABC p2.5","ABC p1","ABC p0.5"),col=c(1:8,"rosybrown"), lty = 1, cex=0.6)
 par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42),mgp=c(3,1,0))
 ```
 
