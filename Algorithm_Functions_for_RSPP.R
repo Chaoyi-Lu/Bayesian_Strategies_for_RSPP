@@ -468,7 +468,7 @@ df_SPP_Parallel_Noisy_MH <- function(Y, beta0, gamma0, eps_beta, eps_gamma, R, K
 
 # Fearnhead & Prangle ABC-MCMC main algorithm for Strauss point process
 # The functions below are designed for real data application
-# The only difference compared with SS1 is the prior range
+# The only difference compared to SS1 is the prior range
 
 df.F.P.ABC.MCMC.Strauss <- function(Y, beta0, gamma0, eps_beta, eps_gamma, lmCoefBeta, lmCoefGamma, Pilot.VarBeta, Pilot.VarGamma, eps, R, T){
   # Y: Observation in point pattern, i.e. ppp()
