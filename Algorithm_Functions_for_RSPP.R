@@ -490,8 +490,6 @@ df.F.P.ABC.MCMC.Strauss <- function(Y, beta0, gamma0, eps_beta, eps_gamma, lmCoe
   gamma_list <- c(gamma0)
   acceptance <- 0
   
-  NumCores <- 7 # Check how many cores used for parallel draws
-  
   for (t in 1:T){
     if ((t%%1000) == 0){
       print(t)
