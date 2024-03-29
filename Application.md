@@ -1071,12 +1071,12 @@ lines(density(RDA_SPP_FPABCMCMC_p0.005_T120000_1$beta[20001:120001],bw = 7.5),co
 legend("topright", legend=c("GT","Ex","NMH K2","ABC p2.5","ABC p1","ABC p0.5"),
        col=c(1:6), lty = 1, cex=0.6)
 
-plot(density(RDA_SPP_NoisyMH_K1_T1200000_1$gamma[200001:1200001],bw = 0.05),xlab = "",ylab="",ylim=c(0,4), main = TeX(r'($\gamma$ Posterior Density)'),cex.main=0.8,cex.lab = 0.8,cex.axis = 0.6)
-lines(density(RDA_SPP_NoisyMH_K1_T120000_1$gamma[20001:120001],bw = 0.05),col=2)
-lines(density(RDA_SPP_NoisyMH_K2_T120000_1$gamma[20001:120001],bw = 0.05),col=3)
-lines(density(RDA_SPP_FPABCMCMC_p0.025_T120000_1$gamma[20001:120001],bw = 0.05),col = 4)
-lines(density(RDA_SPP_FPABCMCMC_p0.01_T120000_1$gamma[20001:120001],bw = 0.05),col = 5)
-lines(density(RDA_SPP_FPABCMCMC_p0.005_T120000_1$gamma[20001:120001],bw = 0.05),col = 6)
+plot(density(RDA_SPP_NoisyMH_K1_T1200000_1$gamma[200001:1200001],bw = 0.04),xlab = "",ylab="",ylim=c(0,4), main = TeX(r'($\gamma$ Posterior Density)'),cex.main=0.8,cex.lab = 0.8,cex.axis = 0.6)
+lines(density(RDA_SPP_NoisyMH_K1_T120000_1$gamma[20001:120001],bw = 0.04),col=2)
+lines(density(RDA_SPP_NoisyMH_K2_T120000_1$gamma[20001:120001],bw = 0.04),col=3)
+lines(density(RDA_SPP_FPABCMCMC_p0.025_T120000_1$gamma[20001:120001],bw = 0.04),col = 4)
+lines(density(RDA_SPP_FPABCMCMC_p0.01_T120000_1$gamma[20001:120001],bw = 0.04),col = 5)
+lines(density(RDA_SPP_FPABCMCMC_p0.005_T120000_1$gamma[20001:120001],bw = 0.04),col = 6)
 legend("topright", legend=c("GT","Ex","NMH K2","ABC p2.5","ABC p1","ABC p0.5"),
        col=c(1:6), lty = 1, cex=0.6)
 par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42),mgp=c(3,1,0))
