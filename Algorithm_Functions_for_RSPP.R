@@ -102,13 +102,10 @@ F.P.ABC.MCMC.Strauss <- function(Y, beta0, gamma0, eps_beta, eps_gamma, lmCoefBe
     beta_p_ub <- min(400,beta_list[t]+eps_beta) # beta proposal upper bound
     gamma_p_lb <- max(0,gamma_list[t]-eps_gamma) # gamma proposal lower bound
     gamma_p_ub <- min(1,gamma_list[t]+eps_gamma) # gamma proposal upper bound
-    
     beta_p <- runif(1, beta_p_lb, beta_p_ub)
     gamma_p <- runif(1, gamma_p_lb, gamma_p_ub)
-    X_p <- rStrauss(beta_p,gamma_p,R,square(1))
-    Kfunc_X_p <- as.function(Kest(X_p, correction="isotropic"))
-    eta_p <- c(log(X_p$n)-log(N_Y),(sqrt(Kfunc_X_p(R))-sqrt(Kfunc_obs_R))^2)
-    psi_p <- (lmCoefBeta[2:3]%*%eta_p)^2/Pilot.VarBeta + (lmCoefGamma[2:3]%*%eta_p)^2/Pilot.VarGamma
+    psi_p <- parSapply(cl, 1, F.P.ABC.Strauss.fair.drawing,beta_p=beta_p,gamma_p=gamma_p,R=R,N_Y=N_Y,Kfunc_obs_R=Kfunc_obs_R,
+                       lmCoefBeta=lmCoefBeta,lmCoefGamma=lmCoefGamma,Pilot.VarBeta=Pilot.VarBeta,Pilot.VarGamma=Pilot.VarGamma)
     
     if (psi_p<=eps){
       # Determine alpha ratio which is the ratio of proposal because priors are uniform distributions
@@ -128,6 +125,14 @@ F.P.ABC.MCMC.Strauss <- function(Y, beta0, gamma0, eps_beta, eps_gamma, lmCoefBe
     }
   }
   return(list(beta = beta_list, gamma = gamma_list, AcceptanceRate = acceptance/T))
+}
+
+F.P.ABC.Strauss.fair.drawing <- function(x,R,beta_p,gamma_p,N_Y,Kfunc_obs_R,lmCoefBeta,lmCoefGamma,Pilot.VarBeta,Pilot.VarGamma){ # Current state beta and gamma
+  X_p <- rStrauss(beta_p,gamma_p,R,square(1))
+  Kfunc_X_p <- as.function(Kest(X_p, correction="isotropic"))
+  eta_p <- c(log(X_p$n)-log(N_Y),(sqrt(Kfunc_X_p(R))-sqrt(Kfunc_obs_R))^2)
+  psi_p <- (lmCoefBeta[2:3]%*%eta_p)^2/Pilot.VarBeta + (lmCoefGamma[2:3]%*%eta_p)^2/Pilot.VarGamma
+  return(psi_p)
 }
 
 #--------------------------------------------------------------------------------------------------------------------------------------------
@@ -368,10 +373,9 @@ F.P.ABC.MCMC.dppG <- function(Y, tau0, sigma0, eps_tau, eps_sigma, lmCoefTau, lm
     sigma_p_lb <- max(0.001,sigma_list[t]-eps_sigma) # sigma proposal lower bound
     sigma_p_ub <- min(1/sqrt(pi*tau_p),sigma_list[t]+eps_sigma) # sigma proposal upper bound
     sigma_p <- runif(1, sigma_p_lb, sigma_p_ub)
-    X_p <- simulate(dppGauss(lambda=tau_p, alpha=sigma_p, d=2))
-    Kfunc_X_p <- as.function(Kest(X_p, correction="isotropic"))
-    eta_p <- c(log(X_p$n)-log(N_Y),(sqrt(Kfunc_X_p(r_M))-sqrt(Kfunc_obs_rM))^2)
-    psi_p <- (lmCoefTau[2:12]%*%eta_p)^2/Pilot.VarTau + (lmCoefSigma[2:12]%*%eta_p)^2/Pilot.VarSigma
+    psi_p <- parSapply(cl, 1, F.P.ABC.dppG.fair.drawing,tau_p=tau_p,sigma_p=sigma_p,r_M=r_M,N_Y=N_Y,Kfunc_obs_rM=Kfunc_obs_rM,
+                       lmCoefTau=lmCoefTau,lmCoefSigma=lmCoefSigma,Pilot.VarTau=Pilot.VarTau,Pilot.VarSigma=Pilot.VarSigma)
+    
     if (psi_p<=eps){
       # Determine alpha ratio which is the ratio of proposal because priors are uniform distributions
       log_alpha_right <- log(tau_p_ub-tau_p_lb) + log(sigma_p_ub-sigma_p_lb) - 
@@ -392,6 +396,13 @@ F.P.ABC.MCMC.dppG <- function(Y, tau0, sigma0, eps_tau, eps_sigma, lmCoefTau, lm
   return(list(tau = tau_list, sigma = sigma_list, AcceptanceRate = acceptance/T))
 }
 
+F.P.ABC.dppG.fair.drawing <- function(x,tau_p,sigma_p,r_M,N_Y,Kfunc_obs_rM,lmCoefTau,lmCoefSigma,Pilot.VarTau,Pilot.VarSigma){ # Current state tau and sigma
+  X_p <- simulate(dppGauss(lambda=tau_p, alpha=sigma_p, d=2))
+  Kfunc_X_p <- as.function(Kest(X_p, correction="isotropic"))
+  eta_p <- c(log(X_p$n)-log(N_Y),(sqrt(Kfunc_X_p(r_M))-sqrt(Kfunc_obs_rM))^2)
+  psi_p <- (lmCoefTau[2:12]%*%eta_p)^2/Pilot.VarTau + (lmCoefSigma[2:12]%*%eta_p)^2/Pilot.VarSigma
+  return(psi_p)
+}
 
 #--------------------------------------------------------------------------------------------------------------------------------------------
 #--------------------------------------------------------------------------------------------------------------------------------------------
@@ -499,13 +510,10 @@ df.F.P.ABC.MCMC.Strauss <- function(Y, beta0, gamma0, eps_beta, eps_gamma, lmCoe
     beta_p_ub <- min(350,beta_list[t]+eps_beta) # beta proposal upper bound
     gamma_p_lb <- max(0,gamma_list[t]-eps_gamma) # gamma proposal lower bound
     gamma_p_ub <- min(1,gamma_list[t]+eps_gamma) # gamma proposal upper bound
-    
     beta_p <- runif(1, beta_p_lb, beta_p_ub)
     gamma_p <- runif(1, gamma_p_lb, gamma_p_ub)
-    X_p <- rStrauss(beta_p,gamma_p,R,square(1))
-    Kfunc_X_p <- as.function(Kest(X_p, correction="isotropic"))
-    eta_p <- c(log(X_p$n)-log(N_Y),(sqrt(Kfunc_X_p(R))-sqrt(Kfunc_obs_R))^2)
-    psi_p <- (lmCoefBeta[2:3]%*%eta_p)^2/Pilot.VarBeta + (lmCoefGamma[2:3]%*%eta_p)^2/Pilot.VarGamma
+    psi_p <- parSapply(cl, 1, F.P.ABC.Strauss.fair.drawing,beta_p=beta_p,gamma_p=gamma_p,R=R,N_Y=N_Y,Kfunc_obs_R=Kfunc_obs_R,
+                       lmCoefBeta=lmCoefBeta,lmCoefGamma=lmCoefGamma,Pilot.VarBeta=Pilot.VarBeta,Pilot.VarGamma=Pilot.VarGamma)
     
     if (psi_p<=eps){
       # Determine alpha ratio which is the ratio of proposal because priors are uniform distributions
