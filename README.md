@@ -1,6 +1,6 @@
 # Bayesian Strategies for Repulsive Spatial Point Processes
 
-This project aims to make the comparison of the noisy Monte-Carlo methods and the ABC-MCMC algorithm implemented on the repulsive point process models.
+This project makes the comparisons of the noisy Monte-Carlo methods and the ABC-MCMC method implemented on the repulsive point process models.
 In this repository, we make the code for all the implementations including two simulation studies and one real data application public.
 
 The file [`Application.md`] is the main notes for the clarification.
