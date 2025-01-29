@@ -130,7 +130,7 @@ SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K1_T120000_1 <-
 time_end <- Sys.time()
 SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K1_T120000_1_time <- time_end-time_start
 # stopCluster(cl)
-# # Time difference of 16.09556 mins
+# # Time difference of 12.86203 mins
 
 # # Noisy M-H K2
 # cl <- parallel::makeCluster(detectCores()[1]-1)
@@ -219,6 +219,61 @@ stopCluster(cl)
 
 The corresponding reference implementation time is also provided above for each case.
 The summarizing processes are similar to the ground truth case shown above and we propose not to put them here in order not to make this file become too lengthy.
+
+The multiple implementations can be easily applied by repeatedly implement the above code for each case.
+Taking the exchange algorithm as an example here, the multiple implementations can be applied as:
+
+``` r
+# Noisy Exchange N1 R2
+cl <- parallel::makeCluster(detectCores()[1]-1)
+clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel running
+time_start <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T120000_2 <-
+  Strauss_Parallel_Noisy_Exchange(Y=cbind(SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$x,SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$y),
+                                  beta0=190, gamma0=0.2,eps_beta=65, eps_gamma=0.16, R=SS1_SPP_R_hat, N=1, T=120000)
+time_end <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T120000_2_time <- time_end-time_start
+stopCluster(cl)
+# Time difference of 12.94468 mins
+
+# Noisy Exchange N1 R3
+cl <- parallel::makeCluster(detectCores()[1]-1)
+clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel running
+time_start <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T120000_3 <-
+  Strauss_Parallel_Noisy_Exchange(Y=cbind(SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$x,SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$y),
+                                  beta0=190, gamma0=0.2,eps_beta=65, eps_gamma=0.16, R=SS1_SPP_R_hat, N=1, T=120000)
+time_end <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T120000_3_time <- time_end-time_start
+stopCluster(cl)
+# Time difference of 12.78789 mins
+
+# Noisy Exchange N1 R4
+cl <- parallel::makeCluster(detectCores()[1]-1)
+clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel running
+time_start <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T120000_4 <-
+  Strauss_Parallel_Noisy_Exchange(Y=cbind(SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$x,SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$y),
+                                  beta0=190, gamma0=0.2,eps_beta=65, eps_gamma=0.16, R=SS1_SPP_R_hat, N=1, T=120000)
+time_end <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T120000_4_time <- time_end-time_start
+stopCluster(cl)
+# Time difference of 13.08903 mins
+
+# Noisy Exchange N1 R5
+cl <- parallel::makeCluster(detectCores()[1]-1)
+clusterExport(cl=cl, list("rStrauss", "square")) # In order to use this function for parallel running
+time_start <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T120000_5 <-
+  Strauss_Parallel_Noisy_Exchange(Y=cbind(SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$x,SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY$y),
+                                  beta0=190, gamma0=0.2,eps_beta=65, eps_gamma=0.16, R=SS1_SPP_R_hat, N=1, T=120000)
+time_end <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T120000_5_time <- time_end-time_start
+stopCluster(cl)
+# Time difference of 13.00712 mins
+```
+
+It's easy to check that the results from multiple implementations are similar to each other.
 
 ### 1.2 The SS1 Implementation of the ABC-MCMC Algorithm
 
