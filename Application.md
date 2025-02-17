@@ -275,9 +275,9 @@ stopCluster(cl)
 
 It's easy to check that the results from multiple implementations are similar to each other.
 
-### 1.2 The SS1 Implementation of the ABC-MCMC Algorithm
+### 1.2 The SS1 Implementation of the ABC-MCMC Algorithms
 
-As we discussed in Section $4$ of the paper, the ABC-MCMC algorithm we make the comparisons to requires a pilot run to approximate the linear coefficients of the linear regression and to decide the acceptance thresholds.
+As we discussed in Section $4$ of the paper, the ABC-MCMC algorithms we explore requires a pilot run to approximate the linear coefficients of the linear regression and to decide the acceptance thresholds.
 We start from setting the $K$-function for the observation $\boldsymbol{y}$ with respect to $\hat{R}$, and setting the number of iterations in the pilot run.
 
 ``` r
