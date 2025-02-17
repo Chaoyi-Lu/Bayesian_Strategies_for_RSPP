@@ -605,6 +605,140 @@ F.P.ABC.dppG.fair.drawing <- function(x,tau_p,sigma_p,r_M,N_Y,Kfunc_obs_rM,lmCoe
 #--------------------------------------------------------------------------------------------------------------------------------------------
 #--------------------------------------------------------------------------------------------------------------------------------------------
 #--------------------------------------------------------------------------------------------------------------------------------------------
+
+# Our corrected  Shirota & Gelfand ABC-MCMC algorithm for determinantal point process Gaussian model with approximate parallel running
+# Repeat draws in the corrected ABC-MCMC algorithm
+Cor.MCApprox.S.G.ABC.MCMC.dppG.repeat.draws <- 
+  function(x,tau_p_lb,tau_p_ub,sigma_p_lb,sigma_c_plus_eps_sigma,r_M,N_Y,Kfunc_obs_rM,lmCoefTau,lmCoefSigma,Pilot.VarTau,Pilot.VarSigma,eps){ # Current state tau and sigma
+    tau_p <- runif(1, tau_p_lb, tau_p_ub)
+    sigma_p_ub <- min(1/sqrt(pi*tau_p),sigma_c_plus_eps_sigma) # sigma proposal upper bound
+    sigma_p <- runif(1, sigma_p_lb, sigma_p_ub)
+    X_p <- simulate(dppGauss(lambda=tau_p, alpha=sigma_p, d=2))
+    Kfunc_X_p <- as.function(Kest(X_p, correction="isotropic"))
+    eta_p <- c(log(X_p$n)-log(N_Y),(sqrt(Kfunc_X_p(r_M))-sqrt(Kfunc_obs_rM))^2)
+    psi_p <- (lmCoefTau[2:12]%*%eta_p)^2/Pilot.VarTau + (lmCoefSigma[2:12]%*%eta_p)^2/Pilot.VarSigma
+    return(c(psi_p<=eps,tau_p,sigma_p))
+  }
+Cor.MCApprox.S.G.ABC.MCMC.dppG.auxiliary.draws <- 
+  function(tau,sigma,r_M,N_Y,Kfunc_obs_rM,lmCoefTau,lmCoefSigma,Pilot.VarTau,Pilot.VarSigma,eps){ # Current state beta and gamma
+    X <- simulate(dppGauss(lambda=tau, alpha=sigma, d=2))
+    Kfunc_X <- as.function(Kest(X, correction="isotropic"))
+    eta <- c(log(X$n)-log(N_Y),(sqrt(Kfunc_X(r_M))-sqrt(Kfunc_obs_rM))^2)
+    psi <- (lmCoefTau[2:12]%*%eta)^2/Pilot.VarTau + (lmCoefSigma[2:12]%*%eta)^2/Pilot.VarSigma
+    return((psi<=eps)*1)
+  }
+Vec.Cor.MCApprox.S.G.ABC.MCMC.dppG.auxiliary.draws <- Vectorize(Cor.MCApprox.S.G.ABC.MCMC.dppG.auxiliary.draws,c("tau","sigma"),SIMPLIFY = "vector")
+# Note that the redundant x below must be there, because it is used for place 1:N or 1:NumCores in the parSapply function
+Vec.Cor.MCApprox.S.G.ABC.MCMC.dppG.auxiliary.draws.AssignFunction <- # draws based on different pairs of (beta,gamma)
+  function(x,Inputmatrix,r_M,N_Y,Kfunc_obs_rM,lmCoefTau,lmCoefSigma,Pilot.VarTau,Pilot.VarSigma,eps){
+    return(Vec.Cor.MCApprox.S.G.ABC.MCMC.dppG.auxiliary.draws(
+      tau=Inputmatrix[1,],sigma=Inputmatrix[2,],
+      r_M=r_M,N_Y=N_Y,Kfunc_obs_rM=Kfunc_obs_rM,lmCoefTau=lmCoefTau,lmCoefSigma=lmCoefSigma,Pilot.VarTau=Pilot.VarTau,Pilot.VarSigma=Pilot.VarSigma,eps=eps
+    ))
+  }
+
+# Corrected Shirota & Gelfand ABC-MCMC main algorithm for determinantal point process Gaussian model
+# with Monte Carlo approximations and approximate parallel running
+Cor.MCApprox.S.G.Parallel.ABC.MCMC.dppG <- 
+  function(Y, tau0, sigma0, eps_tau, eps_sigma, lmCoefTau, lmCoefSigma, Pilot.VarTau, Pilot.VarSigma, eps, r_M, T,
+           zeta_NumDraws_theta,zeta_NumDraws_X){
+    # Y: Observation in point pattern, i.e. ppp()
+    # tau0: initial tau
+    # sigma0: initial sigma
+    # eps_tau: Proposal epsilon of tau
+    # eps_sigma: Proposal epsilon of sigma
+    # lmCoefTau: linear regression coefficients for tau, i.e. logtau = a_tau + b_tau1*eta_1 + b_tau2r1*eta_2r1+b_tau2r2*eta_2r2+...+b_tau2rM*eta_2rM
+    # lmCoefSIgma: linear regression coefficients for sigma, i.e. logsigma = a_sigma + b_sigma1*eta_1 + b_sigma2r1*eta_2r1+...+b_sigma2rM*eta_2rM
+    # Pilot.VarTau: variance of pilot estimated logtau
+    # Pilot.VarSigma: variance of pilot estimated logsigma
+    # eps: epsilon at p* percentile of Pilot.psi
+    # r_M: M equally spaced r's for sufficient statistic
+    
+    N_Y <- Y$n
+    Kfunc_obs=as.function(Kest(Y, correction="isotropic"))
+    Kfunc_obs_rM <- Kfunc_obs(r_M)
+    tau_list <- c(tau0)
+    sigma_list <- c(sigma0)
+    acceptance <- 0
+    NumOfDrawsUntilAcceptance <- c(0) # store the number of draws until while loop stop for each t
+    NumOfAcceptedDrawsInEachNumCoresDraws <- c(0) # store the number of accepted draws when while loop stop for each t
+    NumCores <- 7
+    
+    for (t in 1:T){
+      if ((t%%10) == 0){
+        print(t)
+      }
+      #Define proposal bounds
+      tau_p_lb <- max(50,tau_list[t]-eps_tau) # tau proposal lower bound
+      tau_p_ub <- min(200,tau_list[t]+eps_tau) # tau proposal upper bound
+      sigma_p_lb <- max(0.001,sigma_list[t]-eps_sigma) # sigma proposal lower bound
+      sigma_c_plus_eps_sigma <- sigma_list[t]+eps_sigma
+      
+      # Propose and accept the draws
+      drawscount <- 0
+      repeat{ # generate proposed states until psi < eps
+        # Parallel propose the NumCores draws as well as the acceptance or not,
+        # The output is a 4 X NumCores matrix whose first row are psi_p<=eps, second, third rows are tau_p and sigma_p
+        Flag_psi_and_theta_p <-
+          parSapply(cl, 1:NumCores, Cor.MCApprox.S.G.ABC.MCMC.dppG.repeat.draws, tau_p_lb=tau_p_lb,tau_p_ub=tau_p_ub,sigma_p_lb=sigma_p_lb,
+                    sigma_c_plus_eps_sigma=sigma_c_plus_eps_sigma,#sigma_c=sigma_list[t],eps_sigma=eps_sigma,
+                    r_M=r_M,N_Y=N_Y,Kfunc_obs_rM=Kfunc_obs_rM,lmCoefTau=lmCoefTau,lmCoefSigma=lmCoefSigma,Pilot.VarTau=Pilot.VarTau,Pilot.VarSigma=Pilot.VarSigma,eps=eps)
+        if (sum(Flag_psi_and_theta_p[1,])>0){ # We stop the repeat loop if any of the NumCores draws satisfy the condition, i.e. psi_p<=eps
+          NumOfDrawsUntilAcceptance[t+1] <- drawscount + which.max(Flag_psi_and_theta_p[1,])
+          break
+        }else{
+          drawscount <- drawscount + NumCores
+        }
+      }
+      # it's possible that two or more acceptances happen within one round of NumCores draws
+      # so we pick the first one as the proposed state
+      theta_p <- Flag_psi_and_theta_p[2:3,which.max(Flag_psi_and_theta_p[1,])]
+      tau_p <- theta_p[1]
+      sigma_p <- theta_p[2]
+      NumOfAcceptedDrawsInEachNumCoresDraws[t+1] <- sum(Flag_psi_and_theta_p[1,])
+      
+      # Determine the corrected alpha ratio
+      # Apply Monte Carlo approximations to obtain zeta(theta_c) and zeta(theta_p)
+      Auxi_draws_c_tau <- runif(zeta_NumDraws_theta, tau_p_lb, tau_p_ub)
+      Auxi_draws_c_sigma_ub <- apply(rbind(1/sqrt(pi*Auxi_draws_c_tau),sigma_c_plus_eps_sigma),2,min)
+      Auxi_draws_c <- rbind(Auxi_draws_c_tau,runif(zeta_NumDraws_theta, sigma_p_lb, Auxi_draws_c_sigma_ub))
+      
+      log_zeta_c <- max(log(mean(parSapply(cl, 1:zeta_NumDraws_X, Vec.Cor.MCApprox.S.G.ABC.MCMC.dppG.auxiliary.draws.AssignFunction,
+                                           Inputmatrix=Auxi_draws_c,r_M=r_M,N_Y=N_Y,Kfunc_obs_rM=Kfunc_obs_rM,eps=eps,
+                                           lmCoefTau=lmCoefTau,lmCoefSigma=lmCoefSigma,Pilot.VarTau=Pilot.VarTau,Pilot.VarSigma=Pilot.VarSigma))),
+                        log(1/(zeta_NumDraws_theta*zeta_NumDraws_X+1))) # draw all X|different theta in each core
+      
+      tau_lb <- max(50,tau_p-eps_tau)
+      tau_ub <- min(200,tau_p+eps_tau)
+      sigma_lb <- max(0.001,sigma_p-eps_sigma)
+      Auxi_draws_p_tau <- runif(zeta_NumDraws_theta, tau_lb, tau_ub)
+      Auxi_draws_p_sigma_ub <- apply(rbind(1/sqrt(pi*Auxi_draws_p_tau),sigma_p+eps_sigma),2,min)
+      Auxi_draws_p <- rbind(Auxi_draws_p_tau,runif(zeta_NumDraws_theta, sigma_lb, Auxi_draws_p_sigma_ub))
+      
+      log_zeta_p <- max(log(mean(parSapply(cl, 1:zeta_NumDraws_X, Vec.Cor.MCApprox.S.G.ABC.MCMC.dppG.auxiliary.draws.AssignFunction,
+                                           Inputmatrix=Auxi_draws_p,r_M=r_M,N_Y=N_Y,Kfunc_obs_rM=Kfunc_obs_rM,eps=eps,
+                                           lmCoefTau=lmCoefTau,lmCoefSigma=lmCoefSigma,Pilot.VarTau=Pilot.VarTau,Pilot.VarSigma=Pilot.VarSigma))),
+                        log(1/(zeta_NumDraws_theta*zeta_NumDraws_X+1))) # draw all X|different theta in each core
+      
+      log_alpha_right <- log(tau_p_ub-tau_p_lb) + log(min(1/sqrt(pi*tau_p),sigma_c_plus_eps_sigma)-sigma_p_lb) - log(tau_ub-tau_lb) - 
+        log(min(1/sqrt(pi*tau_list[t]),sigma_p+eps_sigma)-sigma_lb) + log_zeta_c-log_zeta_p
+      
+      if (log(runif(1)) <= min(0, log_alpha_right)){
+        acceptance <- acceptance + 1
+        tau_list[t+1] <- tau_p # update theta list
+        sigma_list[t+1] <- sigma_p
+      }else{
+        tau_list[t+1] <- tau_list[t] # update theta list
+        sigma_list[t+1] <- sigma_list[t]
+      }
+    }
+    return(list(tau = tau_list, sigma = sigma_list, AcceptanceRate = acceptance/T,
+                NumOfDrawsUntilAcceptance = NumOfDrawsUntilAcceptance,NumOfAcceptedDrawsInEachNumCoresDraws = NumOfAcceptedDrawsInEachNumCoresDraws))
+  }
+
+#--------------------------------------------------------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------------------------------------------------------------
 ###################################################
 ### Real Data Application Strauss point process ###
 ###################################################
