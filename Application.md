@@ -1,5 +1,5 @@
 # Simulation Studies and Real Data Application
-This file illustrates the code and the corresponding applications associated to the outputs shown in the *Bayesian Strategies for Repulsive Spatial Point Processes* paper.
+This file illustrates the code and the corresponding applications associated to the outputs shown in the [Bayesian Strategies for Repulsive Spatial Point Processes](https://arxiv.org/abs/2404.15133) paper.
 The code of both two simulation studies and the real data application is provided.
 
 The source function code is included in the [`Algorithm_Functions_for_RSPP.R`] and can be loaded together with some required `R` packages by the following code.
