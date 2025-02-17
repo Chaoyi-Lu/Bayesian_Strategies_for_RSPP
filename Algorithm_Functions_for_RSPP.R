@@ -866,3 +866,119 @@ df.F.P.ABC.MCMC.Strauss <- function(Y, beta0, gamma0, eps_beta, eps_gamma, lmCoe
   }
   return(list(beta = beta_list, gamma = gamma_list, AcceptanceRate = acceptance/T))
 }
+
+#--------------------------------------------------------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------------------------------------------------------------
+#--------------------------------------------------------------------------------------------------------------------------------------------
+
+# Our corrected Shirota & Gelfand ABC-MCMC algorithm for Strauss point process with approximate parallel running
+# The functions below are designed for real duke forest data application
+# The only difference compared to simulation study 1 functions is the prior settings
+
+# Note that the redundant x below must be there, because it is used for place 1:N or 1:NumCores in the parSapply function
+Cor.MCApprox.S.G.ABC.MCMC.Strauss.auxiliary.draws <- 
+  function(beta,gamma,R,N_Y,Kfunc_obs_R,lmCoefBeta,lmCoefGamma,Pilot.VarBeta,Pilot.VarGamma,eps){ # Current state beta and gamma
+    X <- rStrauss(beta,gamma,R,square(1))
+    Kfunc_X <- as.function(Kest(X, correction="isotropic"))
+    eta <- c(log(X$n)-log(N_Y),(sqrt(Kfunc_X(R))-sqrt(Kfunc_obs_R))^2)
+    psi <- (lmCoefBeta[2:3]%*%eta)^2/Pilot.VarBeta + (lmCoefGamma[2:3]%*%eta)^2/Pilot.VarGamma
+    return((psi<=eps)*1)
+  }
+Vec.Cor.MCApprox.S.G.ABC.MCMC.Strauss.auxiliary.draws <- Vectorize(Cor.MCApprox.S.G.ABC.MCMC.Strauss.auxiliary.draws,c("beta","gamma"),SIMPLIFY = "vector")
+Vec.Cor.MCApprox.S.G.ABC.MCMC.Strauss.auxiliary.draws.AssignFunction <- # draws based on different pairs of (beta,gamma)
+  function(x,Inputmatrix,R,N_Y,Kfunc_obs_R,lmCoefBeta,lmCoefGamma,Pilot.VarBeta,Pilot.VarGamma,eps){
+    return(Vec.Cor.MCApprox.S.G.ABC.MCMC.Strauss.auxiliary.draws(
+      beta=Inputmatrix[1,],gamma=Inputmatrix[2,],
+      R=R,N_Y=N_Y,Kfunc_obs_R=Kfunc_obs_R,lmCoefBeta=lmCoefBeta,lmCoefGamma=lmCoefGamma,Pilot.VarBeta=Pilot.VarBeta,Pilot.VarGamma=Pilot.VarGamma,eps=eps
+    ))
+  }
+
+# Corrected Shirota & Gelfand ABC-MCMC main algorithm for Strauss point process 
+# with Monte Carlo approximations and approximate parallel running
+df.Cor.MCApprox.S.G.Parallel.ABC.MCMC.Strauss <- 
+  function(Y, beta0, gamma0, eps_beta, eps_gamma, lmCoefBeta, lmCoefGamma, Pilot.VarBeta, Pilot.VarGamma, eps, R, T,
+           zeta_NumDraws_theta,zeta_NumDraws_X){
+    # Y: Observation in point pattern, i.e. ppp()
+    # beta0: initial beta
+    # gamma0: initial gamma
+    # eps_beta: Proposal epsilon of beta
+    # eps_gamma: Proposal epsilon of gamma
+    # lmCoefBeta: linear regression coefficients for beta, i.e. logbeta = a_beta + b_beta1*eta_1 + b_beta2*eta_2
+    # lmCoefGamma: linear regression coefficients for gamma, i.e. loggamma = a_gamma + b_gamma1*eta_1 + b_gamma2*eta_2
+    # Pilot.VarBeta: variance of pilot estimated logbeta
+    # Pilot.VarGamma: variance of pilot estimated loggamma
+    # eps: epsilon at p* percentile of Pilot.psi
+    # R: estimated radius of SPP, R_hat used for SPP
+    
+    N_Y <- Y$n
+    Kfunc_obs=as.function(Kest(Y, correction="isotropic"))
+    Kfunc_obs_R <- Kfunc_obs(R)
+    beta_list <- c(beta0)
+    gamma_list <- c(gamma0)
+    acceptance <- 0
+    NumOfDrawsUntilAcceptance <- c(0) # store the number of draws until while loop stop for each t
+    NumOfAcceptedDrawsInEachNumCoresDraws <- c(0) # store the number of accepted draws when while loop stop for each t
+    
+    NumCores <- 7 # Check how many cores used for parallel draws
+    
+    for (t in 1:T){
+      if ((t%%100) == 0){
+        print(t)
+      }
+      #Define proposal bounds
+      beta_p_lb <- max(50,beta_list[t]-eps_beta) # beta proposal lower bound
+      beta_p_ub <- min(350,beta_list[t]+eps_beta) # beta proposal upper bound
+      gamma_p_lb <- max(0,gamma_list[t]-eps_gamma) # gamma proposal lower bound
+      gamma_p_ub <- min(1,gamma_list[t]+eps_gamma) # gamma proposal upper bound
+      
+      # Propose and accept the draws
+      drawscount <- 0 # count the number of draws in a repeat loop
+      repeat{ # generate proposed states until psi < eps
+        # Parallel propose the NumCores draws as well as the acceptance or not,
+        # The output is a 4 X NumCores matrix whose first row are psi_p<=eps, second, third rows are beta_p and gamma_p
+        Flag_psi_and_theta_p <- parSapply(cl, 1:NumCores, S.G.ABC.MCMC.Strauss.repeat.draws, beta_p_lb=beta_p_lb,beta_p_ub=beta_p_ub,gamma_p_lb=gamma_p_lb,gamma_p_ub=gamma_p_ub,
+                                          R=R,N_Y=N_Y,Kfunc_obs_R=Kfunc_obs_R,lmCoefBeta=lmCoefBeta,lmCoefGamma=lmCoefGamma,Pilot.VarBeta=Pilot.VarBeta,Pilot.VarGamma=Pilot.VarGamma,eps=eps)
+        if (sum(Flag_psi_and_theta_p[1,])>0){ # We stop the repeat loop if any of the NumCores draws satisfy the condition, i.e. psi_p<=eps
+          NumOfDrawsUntilAcceptance[t+1] <- drawscount + which.max(Flag_psi_and_theta_p[1,])
+          break
+        }else{
+          drawscount <- drawscount + NumCores
+        }
+      }
+      # it's possible that two or more acceptances happen within one round of NumCores draws
+      # so we pick the first one as the proposed state
+      theta_p <- Flag_psi_and_theta_p[2:3,which.max(Flag_psi_and_theta_p[1,])]
+      beta_p <- theta_p[1]
+      gamma_p <- theta_p[2]
+      NumOfAcceptedDrawsInEachNumCoresDraws[t+1] <- sum(Flag_psi_and_theta_p[1,])
+      
+      # Determine the corrected alpha ratio
+      beta_ub <- min(350,beta_p+eps_beta)
+      beta_lb <- max(50,beta_p-eps_beta)
+      gamma_ub <- min(1,gamma_p+eps_gamma)
+      gamma_lb <- max(0,gamma_p-eps_gamma)
+      # Apply Monte Carlo approximations to obtain zeta(theta_c) and zeta(theta_p)
+      Auxi_draws_c <- rbind(runif(zeta_NumDraws_theta, beta_p_lb, beta_p_ub),runif(zeta_NumDraws_theta, gamma_p_lb, gamma_p_ub)) # Aux draws for zeta(theta_c)
+      log_zeta_c <- max(log(mean(parSapply(cl, 1:zeta_NumDraws_X, Vec.Cor.MCApprox.S.G.ABC.MCMC.Strauss.auxiliary.draws.AssignFunction,
+                                           Inputmatrix=Auxi_draws_c,R=R,N_Y=N_Y,Kfunc_obs_R=Kfunc_obs_R,eps=eps,
+                                           lmCoefBeta=lmCoefBeta,lmCoefGamma=lmCoefGamma,Pilot.VarBeta=Pilot.VarBeta,Pilot.VarGamma=Pilot.VarGamma))),log(1/(zeta_NumDraws_theta*zeta_NumDraws_X+1))) # draw all X|different theta in each core
+      
+      Auxi_draws_p <- rbind(runif(zeta_NumDraws_theta, beta_lb, beta_ub),runif(zeta_NumDraws_theta, gamma_lb, gamma_ub)) # Aux draws for zeta(theta_p)
+      log_zeta_p <- max(log(mean(parSapply(cl, 1:zeta_NumDraws_X, Vec.Cor.MCApprox.S.G.ABC.MCMC.Strauss.auxiliary.draws.AssignFunction,
+                                           Inputmatrix=Auxi_draws_p,R=R,N_Y=N_Y,Kfunc_obs_R=Kfunc_obs_R,eps=eps,
+                                           lmCoefBeta=lmCoefBeta,lmCoefGamma=lmCoefGamma,Pilot.VarBeta=Pilot.VarBeta,Pilot.VarGamma=Pilot.VarGamma))),log(1/(zeta_NumDraws_theta*zeta_NumDraws_X+1))) # draw all X|different theta in each core
+      
+      log_alpha_right <- log(beta_p_ub-beta_p_lb) + log(gamma_p_ub-gamma_p_lb) - log(beta_ub-beta_lb) - log(gamma_ub-gamma_lb) +
+        log_zeta_c-log_zeta_p
+      if (log(runif(1)) <= min(0, log_alpha_right)){
+        acceptance <- acceptance + 1
+        beta_list[t+1] <- beta_p # update theta list
+        gamma_list[t+1] <- gamma_p
+      }else{
+        beta_list[t+1] <- beta_list[t] # update theta list
+        gamma_list[t+1] <- gamma_list[t]
+      }
+    }
+    return(list(beta = beta_list, gamma = gamma_list, AcceptanceRate = acceptance/T,
+                NumOfDrawsUntilAcceptance = NumOfDrawsUntilAcceptance,NumOfAcceptedDrawsInEachNumCoresDraws = NumOfAcceptedDrawsInEachNumCoresDraws))
+  }
