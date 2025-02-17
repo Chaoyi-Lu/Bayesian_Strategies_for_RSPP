@@ -367,7 +367,7 @@ SS1_SPP_Pilot.0.01eps <- quantile(SS1_SPP_Pilot.psi,probs=0.01)[[1]]
 SS1_SPP_Pilot.0.025eps <- quantile(SS1_SPP_Pilot.psi,probs=0.025)[[1]]
 ```
 
-The main ABC-MCMC algorithm is implemented as following.
+The Fearnhead & Prangle ABC-MCMC algorithm is implemented as follows.
 We start from the case where the $\epsilon$ is set as $p^\*=2.5$ percent, that is, $p=0.025$, estimated percentile.
 
 ``` r
@@ -383,7 +383,7 @@ SS1_SPP_Beta200_Gamma0.1_R0.05_FPABCMCMC_p0.025_T120000_1_time <- time_end-time_
 # Time difference of 52.84281 mins
 ```
 
-Similar as the exchange and noisy M-H algorithms experiments, we can obtain the summarized statistics of the outputs as follows.
+Similar to the exchange and noisy M-H algorithms experiments, we can obtain the summarized statistics of the outputs as follows.
 
 ``` r
 # # Example summary statistics
@@ -396,8 +396,9 @@ plot(SS1_SPP_Beta200_Gamma0.1_R0.05_FPABCMCMC_p0.025_T120000_1$gamma[20001:12000
 plot(density(SS1_SPP_Beta200_Gamma0.1_R0.05_FPABCMCMC_p0.025_T120000_1$beta[20001:120001]))
 plot(density(SS1_SPP_Beta200_Gamma0.1_R0.05_FPABCMCMC_p0.025_T120000_1$gamma[20001:120001]))
 # ESS/s
-ESS(SS1_SPP_Beta200_Gamma0.1_R0.05_FPABCMCMC_p0.025_T120000_1$beta[20001:120001])/(SS1_SPP_Beta200_Gamma0.1_R0.05_FPABCMCMC_p0.025_T120000_1_time[[1]]*60)
-ESS(SS1_SPP_Beta200_Gamma0.1_R0.05_FPABCMCMC_p0.025_T120000_1$gamma[20001:120001])/(SS1_SPP_Beta200_Gamma0.1_R0.05_FPABCMCMC_p0.025_T120000_1_time[[1]]*60)
+(ESS(SS1_SPP_Beta200_Gamma0.1_R0.05_FPABCMCMC_p0.025_T120000_1$beta[20001:120001])+ESS(SS1_SPP_Beta200_Gamma0.1_R0.05_FPABCMCMC_p0.025_T120000_1$gamma[20001:120001]))/(2*SS1_SPP_Beta200_Gamma0.1_R0.05_FPABCMCMC_p0.025_T120000_1_time[[1]]*60)
+# ESS/t
+(ESS(SS1_SPP_Beta200_Gamma0.1_R0.05_FPABCMCMC_p0.025_T120000_1$beta[20001:120001])+ESS(SS1_SPP_Beta200_Gamma0.1_R0.05_FPABCMCMC_p0.025_T120000_1$gamma[20001:120001]))/(2*100001)
 # Posterior mean
 mean(SS1_SPP_Beta200_Gamma0.1_R0.05_FPABCMCMC_p0.025_T120000_1$beta[20001:120001])
 mean(SS1_SPP_Beta200_Gamma0.1_R0.05_FPABCMCMC_p0.025_T120000_1$gamma[20001:120001])
@@ -433,43 +434,143 @@ SS1_SPP_Beta200_Gamma0.1_R0.05_FPABCMCMC_p0.005_T120000_1_time <- time_end-time_
 # Time difference of 46.1898 mins
 ```
 
+Now we implement the incorrect Shirota & Gelfand ABC-MCMC Algorithm in this SPP simulation study 1 to make the comparisons.
+
+``` r
+## Incorrect Shirota & Gelfand ABC-MCMC algorithm with approximate parallel computation p0.025
+NumCores <- detectCores()[1]-1
+cl <- parallel::makeCluster(NumCores)
+clusterExport(cl=cl, list("rStrauss", "square", "Kest")) # In order to use this function for parallel computation
+time_start <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_SGABCMCMC_p0.025_T120000_1 <-
+  S.G.Parallel.ABC.MCMC.Strauss(Y = SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY, beta0=190, gamma0=0.2,eps_beta=65, eps_gamma=0.16,
+                                lmCoefBeta = SS1_SPP_Pilot.lmCoefBeta, lmCoefGamma = SS1_SPP_Pilot.lmCoefGamma,
+                                Pilot.VarBeta = SS1_SPP_Pilot.VarBeta, Pilot.VarGamma = SS1_SPP_Pilot.VarGamma,
+                                eps = SS1_SPP_Pilot.0.025eps, R=SS1_SPP_R_hat, T=120000)
+time_end <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_SGABCMCMC_p0.025_T120000_1_time <- time_end-time_start
+stopCluster(cl)
+# Time difference of 2.309444 hours
+
+#--------------------------------------------------------------------------------------------------------------------------------------------
+## Incorrect Shirota & Gelfand ABC-MCMC algorithm with approximate parallel computation p0.01
+NumCores <- detectCores()[1]-1
+cl <- parallel::makeCluster(NumCores)
+clusterExport(cl=cl, list("rStrauss", "square", "Kest")) # In order to use this function for parallel computation
+time_start <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_SGABCMCMC_p0.01_T120000_1 <-
+  S.G.Parallel.ABC.MCMC.Strauss(Y = SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY, beta0=190, gamma0=0.2,eps_beta=65, eps_gamma=0.16,
+                                lmCoefBeta = SS1_SPP_Pilot.lmCoefBeta, lmCoefGamma = SS1_SPP_Pilot.lmCoefGamma,
+                                Pilot.VarBeta = SS1_SPP_Pilot.VarBeta, Pilot.VarGamma = SS1_SPP_Pilot.VarGamma,
+                                eps = SS1_SPP_Pilot.0.01eps, R=SS1_SPP_R_hat, T=120000)
+time_end <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_SGABCMCMC_p0.01_T120000_1_time <- time_end-time_start
+stopCluster(cl)
+# Time difference of 3.745619 hours
+
+#--------------------------------------------------------------------------------------------------------------------------------------------
+## Incorrect Shirota & Gelfand ABC-MCMC algorithm with approximate parallel computation p0.005
+NumCores <- detectCores()[1]-1
+cl <- parallel::makeCluster(NumCores)
+clusterExport(cl=cl, list("rStrauss", "square", "Kest")) # In order to use this function for parallel computation
+time_start <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_SGABCMCMC_p0.005_T120000_1 <-
+  S.G.Parallel.ABC.MCMC.Strauss(Y = SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY, beta0=190, gamma0=0.2,eps_beta=65, eps_gamma=0.16,
+                                lmCoefBeta = SS1_SPP_Pilot.lmCoefBeta, lmCoefGamma = SS1_SPP_Pilot.lmCoefGamma,
+                                Pilot.VarBeta = SS1_SPP_Pilot.VarBeta, Pilot.VarGamma = SS1_SPP_Pilot.VarGamma,
+                                eps = SS1_SPP_Pilot.0.005eps, R=SS1_SPP_R_hat, T=120000)
+time_end <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_SGABCMCMC_p0.005_T120000_1_time <- time_end-time_start
+stopCluster(cl)
+# Time difference of 5.698888 hours
+```
+
+Finally, our proposed corrected Shirota & Gelfand ABC-MCMC algorithm is implemented by:
+
+``` r
+## Corrected Shirota & Gelfand ABC-MCMC main algorithm p0.025
+## Here acceptance ratio is corrected and the Monte Carlo approximations are applied for the zeta(theta)
+NumCores <- 7
+cl <- parallel::makeCluster(NumCores)
+clusterExport(cl=cl, list("rStrauss", "square", "Kest","Vec.Cor.MCApprox.S.G.ABC.MCMC.Strauss.auxiliary.draws")) # In order to use this function for parallel running
+time_start <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_CorMC_SGABCMCMC_p0.025_T6000_1 <-
+  Cor.MCApprox.S.G.Parallel.ABC.MCMC.Strauss(Y = SS1_SPP_Beta200_Gamma0.1_R0.05_ObsY, beta0=190, gamma0=0.2,eps_beta=65, eps_gamma=0.16,
+                                             lmCoefBeta = SS1_SPP_Pilot.lmCoefBeta, lmCoefGamma = SS1_SPP_Pilot.lmCoefGamma,
+                                             Pilot.VarBeta = SS1_SPP_Pilot.VarBeta, Pilot.VarGamma = SS1_SPP_Pilot.VarGamma,
+                                             eps = SS1_SPP_Pilot.0.025eps, R=SS1_SPP_R_hat, T=6000,
+                                             zeta_NumDraws_theta=NumCores,zeta_NumDraws_X=7*NumCores)
+time_end <- Sys.time()
+SS1_SPP_Beta200_Gamma0.1_R0.05_CorMC_SGABCMCMC_p0.025_T6000_1_time <- time_end-time_start
+stopCluster(cl)
+# Time difference of 3.419685 hours
+```
+
+Here, smaller number of iterations is proposed to be implemented for. So the corresponding summarized statistics are obtained as follows.
+
+``` r
+# # Example summary statistics
+# Acceptance rate
+SS1_SPP_Beta200_Gamma0.1_R0.05_CorMC_SGABCMCMC_p0.025_T6000_1$AcceptanceRate
+# Posterior trace plot
+plot(SS1_SPP_Beta200_Gamma0.1_R0.05_CorMC_SGABCMCMC_p0.025_T6000_1$beta[1001:6001], type = "l")
+plot(SS1_SPP_Beta200_Gamma0.1_R0.05_CorMC_SGABCMCMC_p0.025_T6000_1$gamma[1001:6001], type = "l")
+# Posterior density plot
+plot(density(SS1_SPP_Beta200_Gamma0.1_R0.05_CorMC_SGABCMCMC_p0.025_T6000_1$beta[1001:6001]))
+plot(density(SS1_SPP_Beta200_Gamma0.1_R0.05_CorMC_SGABCMCMC_p0.025_T6000_1$gamma[1001:6001]))
+# ESS/s
+(ESS(SS1_SPP_Beta200_Gamma0.1_R0.05_CorMC_SGABCMCMC_p0.025_T6000_1$beta[1001:6001])+ESS(SS1_SPP_Beta200_Gamma0.1_R0.05_CorMC_SGABCMCMC_p0.025_T6000_1$gamma[1001:6001]))/2/(SS1_SPP_Beta200_Gamma0.1_R0.05_CorMC_SGABCMCMC_p0.025_T6000_1_time[[1]]*3600)
+# ESS/t
+(ESS(SS1_SPP_Beta200_Gamma0.1_R0.05_CorMC_SGABCMCMC_p0.025_T6000_1$beta[1001:6001])+ESS(SS1_SPP_Beta200_Gamma0.1_R0.05_CorMC_SGABCMCMC_p0.025_T6000_1$gamma[1001:6001]))/2/5001
+# Posterior mean
+mean(SS1_SPP_Beta200_Gamma0.1_R0.05_CorMC_SGABCMCMC_p0.025_T6000_1$beta[1001:6001])
+mean(SS1_SPP_Beta200_Gamma0.1_R0.05_CorMC_SGABCMCMC_p0.025_T6000_1$gamma[1001:6001])
+# Posterior standard deviation
+sd(SS1_SPP_Beta200_Gamma0.1_R0.05_CorMC_SGABCMCMC_p0.025_T6000_1$beta[1001:6001])
+sd(SS1_SPP_Beta200_Gamma0.1_R0.05_CorMC_SGABCMCMC_p0.025_T6000_1$gamma[1001:6001])
+```
+
 The simulation study $1$ boxplots Figure $2$ can be recovered via the code provided below.
 
 ``` r
-par(mfrow=c(1,2),mai = c(0.3, 0.3, 0.05, 0.01),mgp=c(0.45,0.3,0))
-boxplot(SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K1_T1200000_1$beta[200001:1200001],
-        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K1_T120000_1$beta[20001:120001],
-        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K2_T120000_1$beta[20001:120001],
-        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K3_T120000_1$beta[20001:120001],
-        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K4_T120000_1$beta[20001:120001],
-        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K5_T120000_1$beta[20001:120001],
-        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K6_T120000_1$beta[20001:120001],
-        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K7_T120000_1$beta[20001:120001],
-        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K8_T120000_1$beta[20001:120001],
+par(mfrow=c(1,2),mai = c(0.55, 0.45, 0.05, 0.01),mgp=c(1.1,0.55,0))
+boxplot(SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T1200000_1$beta[200001:1200001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T120000_4$beta[20001:120001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N2_T120000_1$beta[20001:120001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N3_T120000_1$beta[20001:120001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N4_T120000_1$beta[20001:120001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N5_T120000_1$beta[20001:120001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N6_T120000_1$beta[20001:120001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N7_T120000_1$beta[20001:120001],
         SS1_SPP_Beta200_Gamma0.1_R0.05_FPABCMCMC_p0.025_T120000_1$beta[20001:120001],
         SS1_SPP_Beta200_Gamma0.1_R0.05_FPABCMCMC_p0.01_T120000_1$beta[20001:120001],
         SS1_SPP_Beta200_Gamma0.1_R0.05_FPABCMCMC_p0.005_T120000_1$beta[20001:120001],
-        xlab = "",ylab = "", main = "",cex.axis = 0.6)
-title(xlab = "",ylab = TeX(r'($\beta$)'), main = "", mgp=c(0.45,0.3,0),cex.main=1,cex.lab = 0.8)
-axis(1, at=c(1:12), labels = c("GT","Ex","K2","K3","K4","K5","K6","K7","K8","p2.5","p1","p0.5"),cex.axis=0.6)
+        SS1_SPP_Beta200_Gamma0.1_R0.05_CorMC_SGABCMCMC_p0.025_T6000_1$beta[1001:6001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_CorMC_SGABCMCMC_p0.01_T6000_1$beta[1001:6001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_CorMC_SGABCMCMC_p0.005_T6000_1$beta[1001:6001],
+        xlab = "",ylab = "", main = "")
+title(xlab = "",ylab = TeX(r'($\beta$)'), main = "",cex.main=1,cex.lab = 0.8)
+axis(1, at=c(1:14), labels = c("GT","Ex","K2","K3","K4","K5","K6","K7",TeX(r'(F&P$_{p2.5}$)'),TeX(r'(F&P$_{p1}$)'),TeX(r'(F&P$_{p0.5}$)'),TeX(r'(cS&G$_{p2.5}$)'),TeX(r'(cS&G$_{p1}$)'),TeX(r'(cS&G$_{p0.5}$)')),cex.axis=0.6, las = 2)
 abline(h=median(SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K1_T1200000_1$beta[200001:1200001]),col = 2,lty = 2)
 
-boxplot(SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K1_T1200000_1$gamma[200001:1200001],
-        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K1_T120000_1$gamma[20001:120001],
-        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K2_T120000_1$gamma[20001:120001],
-        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K3_T120000_1$gamma[20001:120001],
-        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K4_T120000_1$gamma[20001:120001],
-        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K5_T120000_1$gamma[20001:120001],
-        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K6_T120000_1$gamma[20001:120001],
-        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K7_T120000_1$gamma[20001:120001],
-        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K8_T120000_1$gamma[20001:120001],
+boxplot(SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T1200000_1$gamma[200001:1200001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T120000_4$gamma[20001:120001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N2_T120000_1$gamma[20001:120001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N3_T120000_1$gamma[20001:120001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N4_T120000_1$gamma[20001:120001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N5_T120000_1$gamma[20001:120001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N6_T120000_1$gamma[20001:120001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N7_T120000_1$gamma[20001:120001],
         SS1_SPP_Beta200_Gamma0.1_R0.05_FPABCMCMC_p0.025_T120000_1$gamma[20001:120001],
         SS1_SPP_Beta200_Gamma0.1_R0.05_FPABCMCMC_p0.01_T120000_1$gamma[20001:120001],
         SS1_SPP_Beta200_Gamma0.1_R0.05_FPABCMCMC_p0.005_T120000_1$gamma[20001:120001],
-        xlab = "",ylab = "", main = "",cex.axis = 0.6)
-title(xlab = "",ylab = TeX(r'($\gamma$)'), main = "", mgp=c(0.45,0.3,0),cex.main=1,cex.lab = 0.8)
-axis(1, at=c(1:12), labels = c("GT","Ex","K2","K3","K4","K5","K6","K7","K8","p2.5","p1","p0.5"),cex.axis=0.6)
-abline(h=median(SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_K1_T1200000_1$gamma[200001:1200001]),col = 2,lty = 2)
+        SS1_SPP_Beta200_Gamma0.1_R0.05_CorMC_SGABCMCMC_p0.025_T6000_1$gamma[1001:6001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_CorMC_SGABCMCMC_p0.01_T6000_1$gamma[1001:6001],
+        SS1_SPP_Beta200_Gamma0.1_R0.05_CorMC_SGABCMCMC_p0.005_T6000_1$gamma[1001:6001],
+        xlab = "",ylab = "", main = "")
+title(xlab = "",ylab = TeX(r'($\gamma$)'), main = "",cex.main=1,cex.lab = 0.8)
+axis(1, at=c(1:14), labels = c("GT","Ex","K2","K3","K4","K5","K6","K7",TeX(r'(F&P$_{p2.5}$)'),TeX(r'(F&P$_{p1}$)'),TeX(r'(F&P$_{p0.5}$)'),TeX(r'(cS&G$_{p2.5}$)'),TeX(r'(cS&G$_{p1}$)'),TeX(r'(cS&G$_{p0.5}$)')),cex.axis=0.6, las = 2)
+abline(h=median(SS1_SPP_Beta200_Gamma0.1_R0.05_NoisyMH_N1_T1200000_1$gamma[200001:1200001]),col = 2,lty = 2)
 par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42),mgp=c(3,1,0))
 ```
 
