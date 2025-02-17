@@ -1077,7 +1077,7 @@ stopCluster(cl)
 # Time difference of 39.15605 mins
 ```
 
-### 3.2 The RDA Implementation of the ABC-MCMC Algorithm
+### 3.2 The RDA Implementations of the ABC-MCMC Algorithms
 
 The pilot run for the real data applications is shown below.
 The process is exactly the same as SS1 pilot run except the prior settings.
@@ -1138,7 +1138,7 @@ RDA_SPP_Pilot.0.01eps <- quantile(RDA_SPP_Pilot.psi,probs=0.01)[[1]]
 RDA_SPP_Pilot.0.025eps <- quantile(RDA_SPP_Pilot.psi,probs=0.025)[[1]]
 ```
 
-The implementations of the main ABC-MCMC algorithm for all the three different $p$ cases are following.
+The implementations of the Fearnhead & Prangle ABC-MCMC algorithm for all the three different $p$ cases are following.
 
 ```r
 ## Fearnhead & Prangle ABC-MCMC main algorithm p0.025
@@ -1175,92 +1175,134 @@ RDA_SPP_FPABCMCMC_p0.005_T120000_1_time <- time_end-time_start
 # Time difference of 30.66673 mins
 ```
 
-If we construct the Table $3$ shown in Section $7$ of the paper in the `R` code, and store it as `RDA_SPP_comparison_table` in the enviroment, the Figure $7$ of the paper can be recovered by the following code.
+The implementations of the corrected Shirota & Gelfand ABC-MCMC algorithm can be applied following:
 
 ```r
-par(mfrow=c(1,2),mai = c(0.25, 0.25, 0.25, 0.05),mgp=c(1.25,0.25,0))
-plot(RDA_SPP_comparison_table[1,5:12],type = "b",ylim=c(0,9000), pch = 20,xaxt="n",xlab = "",ylab = "")
-lines(RDA_SPP_comparison_table[8,5:12],type = "b",col=2, pch = 20)
-lines(RDA_SPP_comparison_table[9,5:12],type = "b",col=3, pch = 20)
-title(xlab = "",ylab = "", main = "Time and ESS plots of Ex and NMH Cases", mgp=c(0.25,0.25,0),cex.main=0.8,cex.lab = 0.6)
-axis(1, at=c(1:8), labels = c("Ex","K2","K3","K4","K5","K6","K7","K8"),cex.axis=0.5)
-legend("topleft", legend=c("Time", TeX(r'(ESS($\beta$))'), TeX(r'(ESS($\gamma$))')),col=1:3, lty=1, cex=0.6)
-# The above line is correct but the Rstudio could not recognize
+## Corrected Shirota & Gelfand ABC-MCMC main algorithm p0.025
+## Here acceptance ratio is corrected and the Monte Carlo approximations are applied for the zeta(theta)
+NumCores <- 7
+cl <- parallel::makeCluster(NumCores)
+clusterExport(cl=cl, list("rStrauss", "square", "Kest","Vec.Cor.MCApprox.S.G.ABC.MCMC.Strauss.auxiliary.draws")) # In order to use this function for parallel running
+time_start <- Sys.time()
+RDA_SPP_CorMC_SGABCMCMC_p0.025_T6000_1 <-
+  df.Cor.MCApprox.S.G.Parallel.ABC.MCMC.Strauss(Y = ppp(duke_forest$x,duke_forest$y), beta0=190, gamma0=0.2,eps_beta=50, eps_gamma=0.23,
+                                                lmCoefBeta = RDA_SPP_Pilot.lmCoefBeta, lmCoefGamma = RDA_SPP_Pilot.lmCoefGamma,
+                                                Pilot.VarBeta = RDA_SPP_Pilot.VarBeta, Pilot.VarGamma = RDA_SPP_Pilot.VarGamma,
+                                                eps = RDA_SPP_Pilot.0.025eps, R=RDA_SPP_R_hat, T=6000,
+                                                zeta_NumDraws_theta=NumCores,zeta_NumDraws_X=7*NumCores)
+time_end <- Sys.time()
+RDA_SPP_CorMC_SGABCMCMC_p0.025_T6000_1_time <- time_end-time_start
+stopCluster(cl)
+# Time difference of 2.627035 hours
 
-plot(RDA_SPP_comparison_table[10,5:12],type = "b", pch = 20,ylim=c(0,11),xaxt="n",xlab = "",ylab = "")
-abline(h=RDA_SPP_comparison_table[10,2],col = 2,lty = 2)
-abline(h=RDA_SPP_comparison_table[10,3],col = 3,lty = 3)
-abline(h=RDA_SPP_comparison_table[10,4],col = 4,lty = 4)
-title(xlab = "",ylab = "", main = "ESS(Ave)/s Comparison", mgp=c(0.25,0.25,0),cex.main=0.8,cex.lab = 0.6)
-axis(1, at=c(1:8), labels = c("Ex","K2","K3","K4","K5","K6","K7","K8"),cex.axis=0.5)
-legend("topright", legend=c("NMH Different K Cases", "ABC-MCMC p2.5", "ABC-MCMC p1", "ABC-MCMC p0.5"),
-       col=1:4, lty=c(1,2,3,4), cex=0.6)
-par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42),mgp=c(3,1,0))
+#--------------------------------------------------------------------------------------------------------------------------------------------
+## Corrected Shirota & Gelfand ABC-MCMC main algorithm p0.01
+## Here acceptance ratio is corrected and the Monte Carlo approximations are applied for the zeta(theta)
+NumCores <- 7
+cl <- parallel::makeCluster(NumCores)
+clusterExport(cl=cl, list("rStrauss", "square", "Kest","Vec.Cor.MCApprox.S.G.ABC.MCMC.Strauss.auxiliary.draws")) # In order to use this function for parallel running
+time_start <- Sys.time()
+RDA_SPP_CorMC_SGABCMCMC_p0.01_T6000_1 <-
+  df.Cor.MCApprox.S.G.Parallel.ABC.MCMC.Strauss(Y = ppp(duke_forest$x,duke_forest$y), beta0=190, gamma0=0.2,eps_beta=50, eps_gamma=0.23,
+                                                lmCoefBeta = RDA_SPP_Pilot.lmCoefBeta, lmCoefGamma = RDA_SPP_Pilot.lmCoefGamma,
+                                                Pilot.VarBeta = RDA_SPP_Pilot.VarBeta, Pilot.VarGamma = RDA_SPP_Pilot.VarGamma,
+                                                eps = RDA_SPP_Pilot.0.01eps, R=RDA_SPP_R_hat, T=6000,
+                                                zeta_NumDraws_theta=NumCores,zeta_NumDraws_X=7*NumCores)
+time_end <- Sys.time()
+RDA_SPP_CorMC_SGABCMCMC_p0.01_T6000_1_time <- time_end-time_start
+stopCluster(cl)
+# Time difference of 2.688669 hours
+
+#--------------------------------------------------------------------------------------------------------------------------------------------
+## Corrected Shirota & Gelfand ABC-MCMC main algorithm p0.005
+## Here acceptance ratio is corrected and the Monte Carlo approximations are applied for the zeta(theta)
+NumCores <- 7
+cl <- parallel::makeCluster(NumCores)
+clusterExport(cl=cl, list("rStrauss", "square", "Kest","Vec.Cor.MCApprox.S.G.ABC.MCMC.Strauss.auxiliary.draws")) # In order to use this function for parallel running
+time_start <- Sys.time()
+RDA_SPP_CorMC_SGABCMCMC_p0.005_T6000_1 <-
+  df.Cor.MCApprox.S.G.Parallel.ABC.MCMC.Strauss(Y = ppp(duke_forest$x,duke_forest$y), beta0=190, gamma0=0.2,eps_beta=50, eps_gamma=0.23,
+                                                lmCoefBeta = RDA_SPP_Pilot.lmCoefBeta, lmCoefGamma = RDA_SPP_Pilot.lmCoefGamma,
+                                                Pilot.VarBeta = RDA_SPP_Pilot.VarBeta, Pilot.VarGamma = RDA_SPP_Pilot.VarGamma,
+                                                eps = RDA_SPP_Pilot.0.005eps, R=RDA_SPP_R_hat, T=6000,
+                                                zeta_NumDraws_theta=NumCores,zeta_NumDraws_X=7*NumCores)
+time_end <- Sys.time()
+RDA_SPP_CorMC_SGABCMCMC_p0.005_T6000_1_time <- time_end-time_start
+stopCluster(cl)
+# Time difference of 2.81215 hours
 ```
 
-Since the code for constructing the table `RDA_SPP_comparison_table` requires hundreds of lines to summarize the output and to integrate all the summary statistics together.
-We propose not to provide more details here.
-
-The box plots Figure $8$ in Section $7$ can be recovered by the following code.
+The box plots Figure $6$ can be recovered by the following code.
 
 ```r
-par(mfrow=c(1,2),mai = c(0.3, 0.3, 0.05, 0.01),mgp=c(0.45,0.3,0))
-boxplot(RDA_SPP_NoisyMH_K1_T1200000_1$beta[200001:1200001],
-        RDA_SPP_NoisyMH_K1_T120000_1$beta[20001:120001],
-        RDA_SPP_NoisyMH_K2_T120000_1$beta[20001:120001],
-        RDA_SPP_NoisyMH_K3_T120000_1$beta[20001:120001],
-        RDA_SPP_NoisyMH_K4_T120000_1$beta[20001:120001],
-        RDA_SPP_NoisyMH_K5_T120000_1$beta[20001:120001],
-        RDA_SPP_NoisyMH_K6_T120000_1$beta[20001:120001],
-        RDA_SPP_NoisyMH_K7_T120000_1$beta[20001:120001],
-        RDA_SPP_NoisyMH_K8_T120000_1$beta[20001:120001],
+par(mfrow=c(1,2),mai = c(0.55, 0.4, 0.05, 0.01),mgp=c(1,0.65,0))
+boxplot(RDA_SPP_NoisyMH_N1_T1200000_1$beta[200001:1200001],
+        RDA_SPP_NoisyMH_N1_T120000_1$beta[20001:120001],
+        RDA_SPP_NoisyMH_N2_T120000_1$beta[20001:120001],
+        RDA_SPP_NoisyMH_N3_T120000_1$beta[20001:120001],
+        RDA_SPP_NoisyMH_N4_T120000_1$beta[20001:120001],
+        RDA_SPP_NoisyMH_N5_T120000_1$beta[20001:120001],
+        RDA_SPP_NoisyMH_N6_T120000_1$beta[20001:120001],
+        RDA_SPP_NoisyMH_N7_T120000_1$beta[20001:120001],
         RDA_SPP_FPABCMCMC_p0.025_T120000_1$beta[20001:120001],
         RDA_SPP_FPABCMCMC_p0.01_T120000_1$beta[20001:120001],
         RDA_SPP_FPABCMCMC_p0.005_T120000_1$beta[20001:120001],
-        xlab = "",ylab = "", main = "",cex.axis = 0.6)
-title(xlab = "",ylab = TeX(r'($\beta$)'), main = "", mgp=c(0.45,0.3,0),cex.main=1,cex.lab = 0.8)
-axis(1, at=c(1:12), labels = c("GT","Ex","K2","K3","K4","K5","K6","K7","K8","p2.5","p1","p0.5"),cex.axis=0.6)
-abline(h=median(RDA_SPP_NoisyMH_K1_T1200000_1$beta[200001:1200001]),col = 2,lty = 2)
+        RDA_SPP_CorMC_SGABCMCMC_p0.025_T6000_1$beta[1001:6001],
+        RDA_SPP_CorMC_SGABCMCMC_p0.01_T6000_1$beta[1001:6001],
+        RDA_SPP_CorMC_SGABCMCMC_p0.005_T6000_1$beta[1001:6001],
+        xlab = "",ylab = "", main = "",cex.axis = 0.7)
+title(xlab = "",ylab = TeX(r'($\beta$)'), main = "",cex.main=1,cex.lab = 0.8)
+axis(1, at=c(1:14), labels = c("GT","Ex","K2","K3","K4","K5","K6","K7",TeX(r'(F&P$_{p2.5}$)'),TeX(r'(F&P$_{p1}$)'),TeX(r'(F&P$_{p0.5}$)'),TeX(r'(cS&G$_{p2.5}$)'),TeX(r'(cS&G$_{p1}$)'),TeX(r'(cS&G$_{p0.5}$)')),cex.axis=0.6, las = 2)
+abline(h=median(RDA_SPP_NoisyMH_N1_T1200000_1$beta[200001:1200001]),col = 2,lty = 2)
 
-boxplot(RDA_SPP_NoisyMH_K1_T1200000_1$gamma[200001:1200001],
-        RDA_SPP_NoisyMH_K1_T120000_1$gamma[20001:120001],
-        RDA_SPP_NoisyMH_K2_T120000_1$gamma[20001:120001],
-        RDA_SPP_NoisyMH_K3_T120000_1$gamma[20001:120001],
-        RDA_SPP_NoisyMH_K4_T120000_1$gamma[20001:120001],
-        RDA_SPP_NoisyMH_K5_T120000_1$gamma[20001:120001],
-        RDA_SPP_NoisyMH_K6_T120000_1$gamma[20001:120001],
-        RDA_SPP_NoisyMH_K7_T120000_1$gamma[20001:120001],
-        RDA_SPP_NoisyMH_K8_T120000_1$gamma[20001:120001],
+boxplot(RDA_SPP_NoisyMH_N1_T1200000_1$gamma[200001:1200001],
+        RDA_SPP_NoisyMH_N1_T120000_1$gamma[20001:120001],
+        RDA_SPP_NoisyMH_N2_T120000_1$gamma[20001:120001],
+        RDA_SPP_NoisyMH_N3_T120000_1$gamma[20001:120001],
+        RDA_SPP_NoisyMH_N4_T120000_1$gamma[20001:120001],
+        RDA_SPP_NoisyMH_N5_T120000_1$gamma[20001:120001],
+        RDA_SPP_NoisyMH_N6_T120000_1$gamma[20001:120001],
+        RDA_SPP_NoisyMH_N7_T120000_1$gamma[20001:120001],
         RDA_SPP_FPABCMCMC_p0.025_T120000_1$gamma[20001:120001],
         RDA_SPP_FPABCMCMC_p0.01_T120000_1$gamma[20001:120001],
         RDA_SPP_FPABCMCMC_p0.005_T120000_1$gamma[20001:120001],
-        xlab = "",ylab = "", main = "",cex.axis = 0.6)
-title(xlab = "",ylab = TeX(r'($\gamma$)'), main = "", mgp=c(0.45,0.3,0),cex.main=1,cex.lab = 0.8)
-axis(1, at=c(1:12), labels = c("GT","Ex","K2","K3","K4","K5","K6","K7","K8","p2.5","p1","p0.5"),cex.axis=0.6)
-abline(h=median(RDA_SPP_NoisyMH_K1_T1200000_1$gamma[200001:1200001]),col = 2,lty = 2)
+        RDA_SPP_CorMC_SGABCMCMC_p0.025_T6000_1$gamma[1001:6001],
+        RDA_SPP_CorMC_SGABCMCMC_p0.01_T6000_1$gamma[1001:6001],
+        RDA_SPP_CorMC_SGABCMCMC_p0.005_T6000_1$gamma[1001:6001],
+        xlab = "",ylab = "", main = "",cex.axis = 0.7)
+title(xlab = "",ylab = TeX(r'($\gamma$)'), main = "",cex.main=1,cex.lab = 0.8)
+axis(1, at=c(1:14), labels = c("GT","Ex","K2","K3","K4","K5","K6","K7",TeX(r'(F&P$_{p2.5}$)'),TeX(r'(F&P$_{p1}$)'),TeX(r'(F&P$_{p0.5}$)'),TeX(r'(cS&G$_{p2.5}$)'),TeX(r'(cS&G$_{p1}$)'),TeX(r'(cS&G$_{p0.5}$)')),cex.axis=0.6, las = 2)
+abline(h=median(RDA_SPP_NoisyMH_N1_T1200000_1$gamma[200001:1200001]),col = 2,lty = 2)
 par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42),mgp=c(3,1,0))
 ```
 
-The corresponding density plots Figure $9$ of the paper can be recovered by:
+The corresponding density plots Figure $7$ of the paper can be recovered by:
 
 ```r
-par(mfrow=c(1,2),mai = c(0.25, 0.25, 0.25, 0.05),mgp=c(1.25,0.25,0))
-plot(density(RDA_SPP_NoisyMH_K1_T1200000_1$beta[200001:1200001],bw = 7.5),xlab = "",ylab="",xlim=c(50,250),ylim=c(0,0.018), main = TeX(r'($\beta$ Posterior Density)'),cex.main=0.8,cex.lab = 0.8,cex.axis = 0.6)
-lines(density(RDA_SPP_NoisyMH_K1_T120000_1$beta[20001:120001],bw = 7.5),col=2)
-lines(density(RDA_SPP_NoisyMH_K2_T120000_1$beta[20001:120001],bw = 7.5),col=3)
+par(mfrow=c(1,2),mai = c(0.25, 0.25, 0.25, 0.05),mgp=c(1.25,0.4,0))
+plot(density(RDA_SPP_NoisyMH_N1_T1200000_1$beta[200001:1200001],bw = 7.5),xlab = "",ylab="",xlim=c(60,275),ylim=c(0,0.016), main = TeX(r'($\beta$ Posterior Density)'),cex.main=0.8,cex.lab = 0.8,cex.axis = 0.7)
+lines(density(RDA_SPP_NoisyMH_N1_T120000_1$beta[20001:120001],bw = 7.5),col=2)
+lines(density(RDA_SPP_NoisyMH_N2_T120000_1$beta[20001:120001],bw = 7.5),col=3)
 lines(density(RDA_SPP_FPABCMCMC_p0.025_T120000_1$beta[20001:120001],bw = 7.5),col = 4)
 lines(density(RDA_SPP_FPABCMCMC_p0.01_T120000_1$beta[20001:120001],bw = 7.5),col = 5)
 lines(density(RDA_SPP_FPABCMCMC_p0.005_T120000_1$beta[20001:120001],bw = 7.5),col = 6)
-legend("topright", legend=c("GT","Ex","NMH K2","ABC p2.5","ABC p1","ABC p0.5"),
-       col=c(1:6), lty = 1, cex=0.6)
+lines(density(RDA_SPP_CorMC_SGABCMCMC_p0.025_T6000_1$beta[1001:6001],bw = 7.5),col = 7)
+lines(density(RDA_SPP_CorMC_SGABCMCMC_p0.01_T6000_1$beta[1001:6001],bw = 7.5),col = 8)
+lines(density(RDA_SPP_CorMC_SGABCMCMC_p0.005_T6000_1$beta[1001:6001],bw = 7.5),col = "pink")
+legend("topright", legend=c("GT","Ex",TeX(r'(NMH$_{K2}$)'),TeX(r'(F&P$_{p2.5}$)'),TeX(r'(F&P$_{p1}$)'),TeX(r'(F&P$_{p0.5}$)'),TeX(r'(cS&G$_{p2.5}$)'),TeX(r'(cS&G$_{p1}$)'),TeX(r'(cS&G$_{p0.5}$)')),
+       col=c(1:8,"pink"), lty = 1, cex=0.6)
 
-plot(density(RDA_SPP_NoisyMH_K1_T1200000_1$gamma[200001:1200001],bw = 0.04),xlab = "",ylab="",ylim=c(0,4), main = TeX(r'($\gamma$ Posterior Density)'),cex.main=0.8,cex.lab = 0.8,cex.axis = 0.6)
-lines(density(RDA_SPP_NoisyMH_K1_T120000_1$gamma[20001:120001],bw = 0.04),col=2)
-lines(density(RDA_SPP_NoisyMH_K2_T120000_1$gamma[20001:120001],bw = 0.04),col=3)
+plot(density(RDA_SPP_NoisyMH_N1_T1200000_1$gamma[200001:1200001],bw = 0.04),xlab = "",ylab="",xlim=c(0,1),ylim=c(0,3.25), main = TeX(r'($\gamma$ Posterior Density)'),cex.main=0.8,cex.lab = 0.8,cex.axis = 0.7)
+lines(density(RDA_SPP_NoisyMH_N1_T120000_1$gamma[20001:120001],bw = 0.04),col=2)
+lines(density(RDA_SPP_NoisyMH_N2_T120000_1$gamma[20001:120001],bw = 0.04),col=3)
 lines(density(RDA_SPP_FPABCMCMC_p0.025_T120000_1$gamma[20001:120001],bw = 0.04),col = 4)
 lines(density(RDA_SPP_FPABCMCMC_p0.01_T120000_1$gamma[20001:120001],bw = 0.04),col = 5)
 lines(density(RDA_SPP_FPABCMCMC_p0.005_T120000_1$gamma[20001:120001],bw = 0.04),col = 6)
-legend("topright", legend=c("GT","Ex","NMH K2","ABC p2.5","ABC p1","ABC p0.5"),
-       col=c(1:6), lty = 1, cex=0.6)
+lines(density(RDA_SPP_CorMC_SGABCMCMC_p0.025_T6000_1$gamma[1001:6001],bw = 0.04),col = 7)
+lines(density(RDA_SPP_CorMC_SGABCMCMC_p0.01_T6000_1$gamma[1001:6001],bw = 0.04),col = 8)
+lines(density(RDA_SPP_CorMC_SGABCMCMC_p0.005_T6000_1$gamma[1001:6001],bw = 0.04),col = "pink")
+legend("topright", legend=c("GT","Ex",TeX(r'(NMH$_{K2}$)'),TeX(r'(F&P$_{p2.5}$)'),TeX(r'(F&P$_{p1}$)'),TeX(r'(F&P$_{p0.5}$)'),TeX(r'(cS&G$_{p2.5}$)'),TeX(r'(cS&G$_{p1}$)'),TeX(r'(cS&G$_{p0.5}$)')),
+       col=c(1:8,"pink"), lty = 1, cex=0.6)
+
 par(mfrow=c(1,1),mai = c(1.02, 0.82, 0.82, 0.42),mgp=c(3,1,0))
 ```
